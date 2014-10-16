@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "GameView.h"
 #include "HunterView.h"
+#include "Queue.h"
 
 
 // #include "Map.h" ... if you decide to use the Map ADT
@@ -113,6 +114,7 @@ LocationID *whereCanTheyGo(HunterView currentView, int *numLocations,
 	return edges;
 }
 
+//turns your array into the messages
 void getMessages(HunterView h, PlayerMessage *messages)
 {
 	int i;
@@ -129,7 +131,70 @@ int giveMeTurnNum(HunterView h)
 	return giveMeTurnNumber(h->view);
 }
 
+Graph getHunterMap (HunterView h)
+{
+	return getGameMap(h->view);
+}
 
+// find a path between two vertices using breadth-first traversal
+// only allow edges whose weight is less than "max"
+int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea)
+{
+	int tmp_city = src;
+	// Temporary store of path_distance for calculations
+	int tmp_distance = 0;
+	int path_distance = 0;
+
+	// Array of visited cities, if not visited 0, else 1
+	int visited[NUM_MAP_LOCATIONS] = {0};
+
+	// Stores index of the previous city, default value -1
+	int prev[NUM_MAP_LOCATIONS] = {[0 ... (NUM_MAP_LOCATIONS-1)] = -1};
+
+	Queue cityQ = newQueue();
+	QueueJoin(cityQ, src);
+
+	// While Queue is not empty and the tmp_city is not the destination city (e.g. when path to destination city from src is found)
+	while (QueueIsEmpty(cityQ) == 0 && tmp_city != dest) {
+		tmp_city = QueueLeave(cityQ);
+		int *num_locs = NULL;
+		int *locs = whereCanTheyGo(h,num_locs,whoAmI(h),road,rail,sea);
+		int i;
+		for (i=0;i<*num_locs;i++) {
+			if (!visited[tmp_city]) {
+				QueueJoin(cityQ, locs[i]);
+				prev[locs[i]] = tmp_city;
+				visited[locs[i]] = 1;
+			}
+		}
+
+		if (tmp_city == dest) {
+			prev[locs[i]] = tmp_city;
+
+			// Calculating size of path
+			int index = locs[i];
+			while (locs[i] != src) {
+				index = prev[index];
+				path_distance++;
+			}
+
+			// Building path array, storing destination first
+			tmp_distance = path_distance-1;
+			path[tmp_distance] = dest;
+			tmp_distance--;
+
+			// Storing rest of array
+			index = prev[dest];
+			while (tmp_distance >= 0) {
+				path[tmp_distance] = index;
+				index = prev[index];
+				tmp_distance--;
+			}
+			break;
+		}
+	}
+	return path_distance;
+}
 
 
 

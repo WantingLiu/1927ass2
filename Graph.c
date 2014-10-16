@@ -6,9 +6,27 @@
 #include <assert.h>
 #include <string.h>
 #include "Graph.h"
-#include "Queue.h"
 
 
+// graph representation (adjacency matrix)
+typedef struct GraphRep {
+	int    nV;    // #vertices
+	int    nE;    // #edges
+	int  **edges; // matrix of weights (0 == no edge)
+} GraphRep;
+
+
+int getGraphElement (Graph g, int v, int w)
+{
+	assert (g!=NULL);
+	return g->edges[v][w];
+}
+
+int getnV (Graph g)
+{
+	assert (g!=NULL);
+	return g->nV;
+}
 
 // check validity of Vertex
 int validV(Graph g, Vertex v)
@@ -109,58 +127,40 @@ void showGraph2(Graph g)
 
 // find a path between two vertices using breadth-first traversal
 // only allow edges whose weight is less than "max"
-int findPath(Graph g, Vertex src, Vertex dest, int max, int *path)
+int findPathDist(Graph g, Vertex src, Vertex dest)
 {
 	assert(g != NULL && validV(g,src) && validV(g,dest));
-	int temp_city = src;
+	int tmp_city = src;
 	int index = 0;
-	// Temporary store of path_distance for calculations
-	int temp_distance = 0;
 
 	int path_distance = 0;
-
-	// Array of visited cities, if not visited 0, else 1
 	int visited[NUM_MAP_LOCATIONS] = {0};
-
-	// Stores index of the previous city, default value -1
 	int prev[NUM_MAP_LOCATIONS] = {[0 ... (NUM_MAP_LOCATIONS-1)] = -1};
 
 	Queue cityQ = newQueue();
 	QueueJoin(cityQ, src);
 
-	// While Queue is not empty and the temp_city is not the destination city (e.g. when path to destination city from src is found)
-	while (QueueIsEmpty(cityQ) == 0 && temp_city != dest) {
-		temp_city = QueueLeave(cityQ);
+	// While Queue is not empty and the tmp_city is not the destination city (e.g. when path to destination city from src is found)
+	while (QueueIsEmpty(cityQ) == 0 && tmp_city != dest) {
+		tmp_city = QueueLeave(cityQ);
 
 		// Checks through all potential connected cities
 		while (index < g->nV) {
 			// Checking if the distance between the two cities is less than the specified maximum and the city being checked is not the destination
-			if (g->edges[temp_city][index] > 0 && g->edges[temp_city][index] < max && visited[index] != 1 && temp_city != dest) {
+			if (g->edges[tmp_city][index] > 1 && g->edges[tmp_city][index] > 4 && g->edges[tmp_city][index] >6
+						&& g->edges[tmp_city][index] >7 && visited[index] != 1 && tmp_city != dest) {
 				QueueJoin(cityQ, index);
-				prev[index] = temp_city;
+				prev[index] = tmp_city;
 				visited[index] = 1;
 
 			// If city is found
-			} else if (temp_city == dest) {
-				prev[index] = temp_city;
+			} else if (tmp_city == dest) {
+				prev[index] = tmp_city;
 
 				// Calculating size of path
 				while (index != src) {
 					index = prev[index];
 					path_distance++;
-				}
-
-				// Building path array, storing destination first
-				temp_distance = path_distance-1;
-				path[temp_distance] = dest;
-				temp_distance--;
-
-				// Storing rest of array
-				index = prev[dest];
-				while (temp_distance >= 0) {
-					path[temp_distance] = index;
-					index = prev[index];
-					temp_distance--;
 				}
 
 				break;

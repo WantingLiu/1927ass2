@@ -8,6 +8,8 @@
 #include "Globals.h"
 #include "Game.h"
 #include "Places.h"
+#include "Graph.h"
+#include "Queue.h"
 
 typedef struct hunterView *HunterView;
 
@@ -117,5 +119,9 @@ LocationID *whereCanTheyGo(HunterView currentView, int *numLocations,
 void getMessages(HunterView h, PlayerMessage *messages);
 
 int giveMeTurnNum(HunterView h);
+
+Graph getHunterMap (HunterView h);
+
+int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea);
 
 #endif

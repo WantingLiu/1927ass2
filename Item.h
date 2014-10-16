@@ -5,7 +5,6 @@
 #define ITEM_H
 
 #include "Places.h"
-#include "Graph.h"
 
 typedef LocationID Item;
 
