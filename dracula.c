@@ -6,25 +6,41 @@
 #include <time.h>
 #include "Game.h"
 #include "DracView.h"
-#include "Queue.h"
+#include "Graph.h"
+#include "Places.h"
 
+#define MAX_EDGE_WEIGHT 100
 
 static int dracRandomMove(DracView gameState);
 static int getHunterDistance(DracView gameState);
 
 void decideDraculaMove(DracView gameState)
 {
-	int i, minimum; // Minimum stores the distance of the closest hunter
+	LocationID bestPlay;
+	Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
+	addConnections(gameMap);
+	int path[NUM_MAP_LOCATIONS];
+
+	int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
 	PlayerID closestHunter = PLAYER_LORD_GODALMING;
-	minimum = getHunterDistance(gameState, PLAYER_LORD_GODALMING);
+	minimum = findPath(gameMap, whereIs(PLAYER_DRACULA), whereIs(PLAYER_LORD_GODALMING), MAX_EDGE_WEIGHT, path); // Defaulting to PLAYER_LORD_GODALMING initially
+
 	// Getting distance to each hunter to priortise which one to run from
 	for (i = 1; i < 4; i++) {
-		if (getHunterDistance(gameState, i) < minimum) {
-			minimum = getHunterDistance(gameState, i);
+		tempMinimum = findPath(gameMap, whereIs(PLAYER_DRACULA), whereIs(i), MAX_EDGE_WEIGHT, path);
+		if (tempMinimum < minimum) {
+			minimum = tempMinimum;
 			closestHunter = i;
 		}
 	}
 
+	// Getting locations Dracula can go
+
+
+
+
+
+	registerBestPlay(idToName(bestPlay), "");
 	
 	/*
 	
@@ -50,17 +66,6 @@ void decideDraculaMove(DracView gameState)
 	
 	*/
 }
-
-// Function to get distance to a hunter from a specific location
-static int getHunterDistance(DracView gameState, PlayerID hunter) {
-	LocationID hunterLoc = whereIs(gameState, hunter);
-
-
-
-
-	return 0;
-}
-
 
 /*static int dracRandomMove(DracView gameState)
 {

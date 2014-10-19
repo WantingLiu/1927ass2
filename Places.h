@@ -100,7 +100,7 @@ typedef int LocationID;
 #define ZURICH                  70
 
 #define MIN_MAP_LOCATION         0
-#define 	MAX_MAP_LOCATION        70
+#define MAX_MAP_LOCATION        70
 #define NUM_MAP_LOCATIONS       71
 
 // Other "locations"
