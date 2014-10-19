@@ -6,24 +6,24 @@
 #include <time.h>
 #include "Game.h"
 #include "DracView.h"
+#include "Queue.h"
 
 
-int dracRandomMove(DracView gameState);
+static int dracRandomMove(DracView gameState);
+static int getHunterDistance(DracView gameState);
 
 void decideDraculaMove(DracView gameState)
 {
-	// Seeding srand
-	srand(time(NULL));
-	// Getting random move
-	int move = dracRandomMove(gameState);
-	// Converting location ID to location string
-	char* moveTo = idToAbbrev(move);
-
-
-	// Best Play
-	registerBestPlay(moveTo, "SHIGGLES");
-
-
+	int i, minimum; // Minimum stores the distance of the closest hunter
+	PlayerID closestHunter = PLAYER_LORD_GODALMING;
+	minimum = getHunterDistance(gameState, PLAYER_LORD_GODALMING);
+	// Getting distance to each hunter to priortise which one to run from
+	for (i = 1; i < 4; i++) {
+		if (getHunterDistance(gameState, i) < minimum) {
+			minimum = getHunterDistance(gameState, i);
+			closestHunter = i;
+		}
+	}
 
 	
 	/*
@@ -51,13 +51,24 @@ void decideDraculaMove(DracView gameState)
 	*/
 }
 
-int dracRandomMove(DracView gameState)
+// Function to get distance to a hunter from a specific location
+static int getHunterDistance(DracView gameState, PlayerID hunter) {
+	LocationID hunterLoc = whereIs(gameState, hunter);
+
+
+
+
+	return 0;
+}
+
+
+/*static int dracRandomMove(DracView gameState)
 {
 	int* numLocations = NULL;
 	int* possibleLocs = whereCanIgo(gameState, numLocations, TRUE, FALSE);
 
 	int randIndex = (rand()%(*numLocations-1));
 	return possibleLocs[randIndex];
-}
+}*/
 
 
