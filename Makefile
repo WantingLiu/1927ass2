@@ -33,7 +33,7 @@ hunterPlayer.o : player.c Game.h HunterView.h hunter.h
 	$(CC) $(CFLAGS) -c player.c -o hunterPlayer.o
 
 IntList.o : IntList.c IntList.h
-dracula.o : dracula.c Game.h DracView.h
+dracula.o : dracula.c Game.h DracView.h Graph.h Places.h
 hunter.o : hunter.c Game.h HunterView.h
 Places.o : Places.c Places.h
 Queue.o : Queue.c Queue.h Item.h

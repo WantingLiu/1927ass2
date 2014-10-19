@@ -48,5 +48,7 @@ int  findPath(Graph, Vertex, Vertex, int, int *);
 
 void showGraph2(Graph g);
 
+// Functions to add connections
 void addConnections(Graph g);
+void addRoadConnections(Graph g);
 #endif

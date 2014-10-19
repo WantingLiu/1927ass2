@@ -11,33 +11,48 @@
 
 #define MAX_EDGE_WEIGHT 100
 
-static int dracRandomMove(DracView gameState);
-static int getHunterDistance(DracView gameState);
-
 void decideDraculaMove(DracView gameState)
 {
 	LocationID bestPlay;
-	Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
-	addConnections(gameMap);
-	int path[NUM_MAP_LOCATIONS];
+	// Getting locations Dracula can go to
+	int numLocations;
+	int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
 
-	int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
-	PlayerID closestHunter = PLAYER_LORD_GODALMING;
-	minimum = findPath(gameMap, whereIs(PLAYER_DRACULA), whereIs(PLAYER_LORD_GODALMING), MAX_EDGE_WEIGHT, path); // Defaulting to PLAYER_LORD_GODALMING initially
+	// If Dracula has at least 1 legal move
+	if (numLocations > 0) {
+		Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
+		// Only dealing with road connections for now
+		addRoadConnections(gameMap);
+		int path[NUM_MAP_LOCATIONS];
 
-	// Getting distance to each hunter to priortise which one to run from
-	for (i = 1; i < 4; i++) {
-		tempMinimum = findPath(gameMap, whereIs(PLAYER_DRACULA), whereIs(i), MAX_EDGE_WEIGHT, path);
-		if (tempMinimum < minimum) {
-			minimum = tempMinimum;
-			closestHunter = i;
+		int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
+		PlayerID closestHunter = PLAYER_LORD_GODALMING;
+		minimum = findPath(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING), MAX_EDGE_WEIGHT, path); // Defaulting to PLAYER_LORD_GODALMING initially
+
+		// Getting distance to each hunter to priortise which one to run from
+		for (i = 1; i < 4; i++) {
+			tempMinimum = findPath(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i), MAX_EDGE_WEIGHT, path);
+			if (tempMinimum < minimum) {
+				minimum = tempMinimum;
+				closestHunter = i;
+			}
 		}
+
+		// Finding location that is furthest away from the closest hunter
+		bestPlay = paths[0];
+		minimum = findPath(gameMap, closestHunter, paths[0], MAX_EDGE_WEIGHT, path);
+		for (i = 1; i < numLocations; i++) {
+			tempMinimum = findPath(gameMap, closestHunter, paths[i], MAX_EDGE_WEIGHT, path);
+			if (tempMinimum < minimum) {
+				minimum = tempMinimum;
+				bestPlay = paths[i];
+			}
+		}
+	} else {
+
+		bestPlay = CASTLE_DRACULA;
+
 	}
-
-	// Getting locations Dracula can go
-
-
-
 
 
 	registerBestPlay(idToName(bestPlay), "");
@@ -60,9 +75,6 @@ void decideDraculaMove(DracView gameState)
 	If below 10 life, move towards castle
 	When to ocen
 	Look for bottlenecks and make traps
-	
-	
-	
 	
 	*/
 }
