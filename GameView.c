@@ -37,6 +37,7 @@ int makeList(int *locs, Queue q);
 static void addTrail(GameView g, PlayerID p, LocationID loc);
 static void addEncounter(GameView g, LocationID loc);
 static void removeEncounter(GameView g, PlayerID p);
+static int getIsDead(GameView currentView, PlayerID player);
 //===============================
 //			Static Functions
 //===============================
@@ -97,7 +98,7 @@ static void makeActionHunter(GameView g, PlayerID p, char a)
 	g->health[p] -= lifeLoss;
 	
 	if (g->health[p] <= 0) {
-		g->health[p] = GAME_START_HUNTER_LIFE_POINTS;
+		g->health[p] = -1;
 		g->score -= 6;
 	}
 }
@@ -168,31 +169,18 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 	//go forward through past plays and make actions
 	int curr = 0;
 	while (pastPlays[curr] != '\0') {
+	
 		//printf("evaluating %c pos %d\n", pastPlays[curr], curr);
 		//determine which player
 		PlayerID p;
-		switch (pastPlays[curr]) {
-			case 'G':
-				p = PLAYER_LORD_GODALMING;
-				break;
-			case 'S':
-				p = PLAYER_DR_SEWARD;	
-				break;
-			case 'H':
-				p = PLAYER_VAN_HELSING;
-				break;
-			case 'M':
-				p = PLAYER_MINA_HARKER;
-				break;	
-			case 'D':
-				p = PLAYER_DRACULA;
-				break;
-			default:
-				goto EndWhile;
-				fprintf(stderr, "An error occured: Player could not be recognised\n");
-				exit(0);
-		}
-		
+		if (pastPlays[curr] == 'G') {p = PLAYER_LORD_GODALMING;}
+		else if (pastPlays[curr] == 'S') {p = PLAYER_DR_SEWARD;}
+		else if (pastPlays[curr] == 'H') {p = PLAYER_VAN_HELSING;}
+		else if (pastPlays[curr] == 'M') {p = PLAYER_MINA_HARKER;}
+		else if (pastPlays[curr] == 'D') {p = PLAYER_DRACULA;}
+		else {goto EndWhile;}
+			
+		if(getIsDead(g,p)) g->health[p] = GAME_START_HUNTER_LIFE_POINTS;
 		//get location id from string from lab
 		//using Places.c
 		char abbrev[3];
@@ -220,6 +208,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 		} else {
 			LocationID loc = abbrevToID(abbrev);
 			addTrail(g, p, loc);
+			
 		}
 		
 		//make actions
@@ -283,13 +272,22 @@ int getScore(GameView currentView)
 // Get the current health points for a given player
 int getHealth(GameView currentView, PlayerID player)
 {
+	if (getIsDead(currentView,player)) return GAME_START_HUNTER_LIFE_POINTS;
 	return currentView->health[player];
 }
+
+static int getIsDead(GameView currentView, PlayerID player)
+{
+	if (currentView->health[player] < 1) return TRUE;
+	return FALSE;
+}
+
 
 // Get the current location id of a given player
 LocationID getLocation(GameView currentView, PlayerID player)
 {
-	return currentView->trails[player][0];;
+	if (getIsDead(currentView, player)) return ST_JOSEPH_AND_ST_MARYS;
+	return currentView->trails[player][0];
 }
 
 //// Functions that return information about the history of the game
@@ -321,14 +319,14 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
 	LocationID to;
 	Queue locQ = newQueue();
 	QueueJoin(locQ,from);
-	for (to=0;to<currentView->map->nV;to++) {
-		int val = currentView->map->edges[from][to];
+	for (to=0;to<getnV(currentView->map);to++) {
+		int val = getGraphElement(currentView->map,from,to);
 		//printf("%s to %s is %d\n",idToName(from),idToName(to),val);
 		if (val >= 4) {
 			val -= 4;
 			if (sea) {
 				QueueJoin(locQ,to);
-				printf("adding %s to found (boat)\n",idToName(to));
+				//printf("adding %s to found (boat)\n",idToName(to));
 			}
 		} 
 		if (val >= 2) {
@@ -338,10 +336,10 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
 				QueueJoin(search,from);
 				LocationID *prevBase = calloc(NUM_MAP_LOCATIONS,sizeof(int));
 				int recurse = (round + player) % 4;
-				printf("recurse is %d\n", recurse);
+				//printf("recurse is %d\n", recurse);
 				if (recurse) {
 					Queue tmp = railLocs(currentView->map, search, prevBase, recurse);
-					printf("tmp is "); showQueue(tmp);
+					//printf("tmp is "); showQueue(tmp);
 					QueueCat(locQ,tmp);
 				}
 			}
@@ -349,7 +347,7 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
 		if (val >= 1) {
 			if (road) {
 				QueueJoin(locQ,to);
-				printf("adding %s to found (road)\n",idToName(to));
+				//printf("adding %s to found (road)\n",idToName(to));
 			}
 		}
 	}
@@ -364,7 +362,7 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
 int makeList(int *locs, Queue q)
 {
 	int i = 0;
-	printf("final list is:\n");
+	//printf("final list is:\n");
 	while(!QueueIsEmpty(q)) {
 		LocationID val = QueueLeave(q);
 		if(!inArray(locs, val)) {
@@ -401,9 +399,9 @@ Queue railLocs(Graph map, Queue search, LocationID *prevBase, int recurse)
 	int k;
 	int i;
 	for(k=0;k<j;k++) {
-		for (i=0;i<map->nV;i++) {
+		for (i=0;i<getnV(map);i++) {
 			if (prevBase[i] == TRUE) continue;			
-			int val = map->edges[prev[k]][i];
+			int val = getGraphElement(map,prev[k],i);
 			//printf("%s to %s is %d\n",idToName(prev[k]),idToName(i),val);
 			if (val == 2 || val == 3 || val == 6 || val == 7) {
 				QueueJoin(found, i);
@@ -417,26 +415,15 @@ Queue railLocs(Graph map, Queue search, LocationID *prevBase, int recurse)
 	return found;
 }
 
-
-
-/*
-void main () {
-	printf("This is now working\n");
-	
-	printf("Test basic empty initialisation\n");
-	PlayerMessage messages1[] = {};
-	GameView gv = newGameView("", messages1);
-	printf("vertices is %d\n", gv->map->nV);
-}
-
-*/
-
 int giveMeTurnNumber(GameView g)
 {
 	return g->turnNum;
 }
 
-
+Graph getGameMap (GameView g)
+{
+	return g->map;
+}
 
 
 

@@ -8,6 +8,8 @@
 #include "Globals.h"
 #include "Game.h"
 #include "Places.h"
+#include "Graph.h"
+#include "Queue.h"
 
 typedef struct hunterView *HunterView;
 
@@ -97,7 +99,7 @@ void giveMeTheTrail(HunterView currentView, PlayerID player,
 // The array can be in any order but must contain unique entries
 // The current location should be included in the array (could rest)
 
-LocationID *whereCanIgo(HunterView currentView, int *numLocations,
+LocationID *whereCanIGo(HunterView currentView, int *numLocations,
                         int road, int rail, int sea);
 
 // whereCanTheyGo() returns an array of LocationIDs giving all of the
@@ -117,5 +119,9 @@ LocationID *whereCanTheyGo(HunterView currentView, int *numLocations,
 void getMessages(HunterView h, PlayerMessage *messages);
 
 int giveMeTurnNum(HunterView h);
+
+Graph getHunterMap (HunterView h);
+
+int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea);
 
 #endif

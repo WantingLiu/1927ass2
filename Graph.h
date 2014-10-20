@@ -5,8 +5,12 @@
 #define GRAPH_H
 
 #include <stdio.h>
+#include "Item.h"
+#include "Queue.h"
+#include "Places.h"
 
 /*
+key for graph
 0 == --- == no access
 1 == --x == ROAD
 2 == -w- == RAIL
@@ -19,32 +23,19 @@
 
 #define BOAT_C 4
 
-// graph representation is hidden
-
-
-// graph representation (adjacency matrix)
-typedef struct GraphRep {
-	int    nV;    // #vertices
-	int    nE;    // #edges
-	int  **edges; // matrix of weights (0 == no edge)
-} GraphRep;
-
 typedef struct GraphRep *Graph;
-
-// vertices denoted by integers 0..N-1
 typedef int Vertex;
-int   validV(Graph,Vertex); //validity check
 
-// edges are pairs of vertices (end-points)
+int getGraphElement (Graph g, int v, int x);
+int getnV (Graph g);
+int validV(Graph,Vertex); //validity check
 void insertEdge(Graph, Vertex, Vertex, int);
 void removeEdge(Graph, Vertex, Vertex);
-
-// operations on graphs
 Graph newGraph(int nV);
 void dropGraph(Graph);
 Graph makeGraph(int, int**);
 void showGraph(Graph, char **);
-int  findPath(Graph, Vertex, Vertex, int, int *);
+int findPathDist(Graph g, Vertex src, Vertex dest);
 
 void showGraph2(Graph g);
 

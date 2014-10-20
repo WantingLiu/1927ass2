@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include "Game.h"
 #include "Places.h"
+#include "Graph.h"
 
 typedef struct gameView *GameView;
 
@@ -127,6 +128,10 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
                                LocationID from, PlayerID player, Round round,
                                int road, int rail, int sea);
 
+//gets the turn number
 int giveMeTurnNumber(GameView g);
+
+//returns the map so that people can look at it
+Graph getGameMap (GameView g);
 
 #endif
