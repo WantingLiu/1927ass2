@@ -99,7 +99,7 @@ void giveMeTheTrail(HunterView currentView, PlayerID player,
 // The array can be in any order but must contain unique entries
 // The current location should be included in the array (could rest)
 
-LocationID *whereCanIgo(HunterView currentView, int *numLocations,
+LocationID *whereCanIGo(HunterView currentView, int *numLocations,
                         int road, int rail, int sea);
 
 // whereCanTheyGo() returns an array of LocationIDs giving all of the

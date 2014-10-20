@@ -169,6 +169,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 	//go forward through past plays and make actions
 	int curr = 0;
 	while (pastPlays[curr] != '\0') {
+	
 		//printf("evaluating %c pos %d\n", pastPlays[curr], curr);
 		//determine which player
 		PlayerID p;
@@ -178,7 +179,8 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 		else if (pastPlays[curr] == 'M') {p = PLAYER_MINA_HARKER;}
 		else if (pastPlays[curr] == 'D') {p = PLAYER_DRACULA;}
 		else {goto EndWhile;}
-		
+			
+		if(getIsDead(g,p)) g->health[p] = GAME_START_HUNTER_LIFE_POINTS;
 		//get location id from string from lab
 		//using Places.c
 		char abbrev[3];
@@ -270,13 +272,13 @@ int getScore(GameView currentView)
 // Get the current health points for a given player
 int getHealth(GameView currentView, PlayerID player)
 {
-	if (currentView->health[player] == -1) return GAME_START_HUNTER_LIFE_POINTS;
+	if (getIsDead(currentView,player)) return GAME_START_HUNTER_LIFE_POINTS;
 	return currentView->health[player];
 }
 
 static int getIsDead(GameView currentView, PlayerID player)
 {
-	if (currentView->health[player] == -1) return TRUE;
+	if (currentView->health[player] < 1) return TRUE;
 	return FALSE;
 }
 
