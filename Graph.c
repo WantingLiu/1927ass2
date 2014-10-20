@@ -177,7 +177,7 @@ int findPathDist(Graph g, Vertex src, Vertex dest)
 
 // find a path between two vertices using breadth-first traversal
 // only allow edges whose weight is less than "max"
-int findPath(Graph g, Vertex src, Vertex dest, int max, int *path)
+int findPathGraph(Graph g, Vertex src, Vertex dest, int max, int *path)
 {
 	assert(g != NULL && validV(g,src) && validV(g,dest));
 	int temp_city = src;

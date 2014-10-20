@@ -42,7 +42,7 @@ void decideHunterMove(HunterView gameState)
 {
 	srand(time(NULL));
 	
-	int move;
+	int move = 0;
 	int current_player = whoAmI(gameState);
 	int current_rank = getRank(gameState, current_player);
 	int current_round = giveMeTheRound(gameState);
