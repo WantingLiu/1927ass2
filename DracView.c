@@ -226,7 +226,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
     // Case if double back or hide is in the trail, can't have anything in edges array that is in trail
     if (doubleBack == TRUE && hide == TRUE) {
         for (i = 0; i < *numLocations; i++) {
-            if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != trail[5]) {
+            if (edges[i] != trail[0] && edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != trail[5]) {
                 newEdges[i] = edges[i];
             } else {
                 // If an invalid location is found, reduce number of locations
@@ -238,7 +238,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
     // Case if only doubleBack in trail, can't have anything in trail array apart from most recent location but only if it is not sea (can't hide there)
     } else if (doubleBack == TRUE) {
         for (i = 0; i < *numLocations; i++) {
-            if (edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != trail[5]) {
+            if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != trail[5]) {
                 if (edges[i] == trail[1]) {
                     if (idToType(trail[1]) != SEA) {
                         newEdges[i] = edges[i];
@@ -247,6 +247,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
                     newEdges[i] = edges[i];
                 }
             } else {
+                // Invalid location, reduce number of locations possible
                 (*numLocations)--;
             }
         }
