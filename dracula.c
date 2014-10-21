@@ -28,6 +28,7 @@ void decideDraculaMove(DracView gameState)
 
 		int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
 		PlayerID closestHunter = PLAYER_LORD_GODALMING;
+
 		minimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING)); // Defaulting to PLAYER_LORD_GODALMING initially
 	  // Getting distance to each hunter to priortise which one to run from
 //Bernice comments: rather have a global variable NUM_PLAYERS instead of a magic number      

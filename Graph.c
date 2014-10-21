@@ -244,9 +244,6 @@ int findPathGraph(Graph g, Vertex src, Vertex dest, int max, int *path)
 }
 
 
-
-
-
 // Add edges to Graph representing map of Europe
 void addConnections(Graph g)
 {
