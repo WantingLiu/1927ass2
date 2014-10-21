@@ -61,7 +61,7 @@ void decideDraculaMove(DracView gameState)
 	}
 
 
-   registerBestPlay(idToName(bestPlay), "");
+   registerBestPlay(idToAbbrev(bestPlay), "");
    
    /*
    
