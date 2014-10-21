@@ -243,6 +243,7 @@ int findPathGraph(Graph g, Vertex src, Vertex dest, int max, int *path)
 	return path_distance;
 }
 
+
 // Add edges to Graph representing map of Europe
 void addConnections(Graph g)
 {

@@ -37,6 +37,7 @@ Graph makeGraph(int, int**);
 void showGraph(Graph, char **);
 int findPathDist(Graph g, Vertex src, Vertex dest);
 int findPathGraph(Graph g, Vertex src, Vertex dest, int max, int *path);
+
 void showGraph2(Graph g);
 
 // Functions to add connections
