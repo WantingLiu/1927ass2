@@ -27,11 +27,11 @@ void decideDraculaMove(DracView gameState)
 
 		int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
 		PlayerID closestHunter = PLAYER_LORD_GODALMING;
-		minimum = findPath(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING), MAX_EDGE_WEIGHT, path); // Defaulting to PLAYER_LORD_GODALMING initially
+		minimum = findPathGraph(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING), MAX_EDGE_WEIGHT, path); // Defaulting to PLAYER_LORD_GODALMING initially
 
 		// Getting distance to each hunter to priortise which one to run from
 		for (i = 1; i < 4; i++) {
-			tempMinimum = findPath(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i), MAX_EDGE_WEIGHT, path);
+			tempMinimum = findPathGraph(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i), MAX_EDGE_WEIGHT, path);
 			if (tempMinimum < minimum) {
 				minimum = tempMinimum;
 				closestHunter = i;
@@ -40,9 +40,9 @@ void decideDraculaMove(DracView gameState)
 
 		// Finding location that is furthest away from the closest hunter
 		bestPlay = paths[0];
-		minimum = findPath(gameMap, closestHunter, paths[0], MAX_EDGE_WEIGHT, path);
+		minimum = findPathGraph(gameMap, closestHunter, paths[0], MAX_EDGE_WEIGHT, path);
 		for (i = 1; i < numLocations; i++) {
-			tempMinimum = findPath(gameMap, closestHunter, paths[i], MAX_EDGE_WEIGHT, path);
+			tempMinimum = findPathGraph(gameMap, closestHunter, paths[i], MAX_EDGE_WEIGHT, path);
 			if (tempMinimum < minimum) {
 				minimum = tempMinimum;
 				bestPlay = paths[i];
