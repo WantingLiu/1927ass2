@@ -32,26 +32,26 @@ void decideDraculaMove(DracView gameState)
 		minimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING)); // Defaulting to PLAYER_LORD_GODALMING initially
 	  // Getting distance to each hunter to priortise which one to run from
 //Bernice comments: rather have a global variable NUM_PLAYERS instead of a magic number      
-	for (i = 1; i < NUM_PLAYERS-1; i++) {
-//Bernice comments: Brady has implemented a findPathDist() function that only returns the distance without having to pass in an array pointer.
-//    rather use findPathDist() to eliminate any possibility of seg faults because we know how annoying C is when this happens
-		tempMinimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i));
-		if (tempMinimum < minimum) {
-			minimum = tempMinimum;
-			closestHunter = i;
+		for (i = 1; i < NUM_PLAYERS-1; i++) {
+	//Bernice comments: Brady has implemented a findPathDist() function that only returns the distance without having to pass in an array pointer.
+	//    rather use findPathDist() to eliminate any possibility of seg faults because we know how annoying C is when this happens
+			tempMinimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i));
+			if (tempMinimum < minimum) {
+				minimum = tempMinimum;
+				closestHunter = i;
+			}
 		}
-	}
 
-	  // Finding location that is furthest away from the closest hunter
-	bestPlay = paths[0];
-	minimum = findPathDist(gameMap, closestHunter, paths[0]);
-	for (i = 1; i < numLocations; i++) {
-		tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
-		if (tempMinimum < minimum) {
-			minimum = tempMinimum;
-			bestPlay = paths[i];
+		  // Finding location that is furthest away from the closest hunter
+		bestPlay = paths[0];
+		minimum = findPathDist(gameMap, closestHunter, paths[0]);
+		for (i = 1; i < numLocations; i++) {
+			tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
+			if (tempMinimum < minimum) {
+				minimum = tempMinimum;
+				bestPlay = paths[i];
+			}
 		}
-	}
 //Bernice comments: what if a hunter is exactly one location away from Dracula? Do we want to attack?
    // If no possible locations to move to
 	} else if (numLocations == 0) {
