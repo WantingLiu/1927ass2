@@ -136,6 +136,8 @@ static int makeActionDracula(GameView g, PlayerID p, char a, int index)
 // Creates a new GameView to summarise the current state of the game
 GameView newGameView(char *pastPlays, PlayerMessage messages[])
 {
+	printf("past plays is %s\n",pastPlays);
+
 	GameView g = malloc(sizeof(struct gameView));
 	
 	g->map = newGraph(NUM_MAP_LOCATIONS);	
@@ -168,7 +170,8 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 	
 	//go forward through past plays and make actions
 	int curr = 0;
-	while (pastPlays[curr] != '\0') {
+	int length = strlen(pastPlays);
+	while (curr < length) {
 	
 		//printf("evaluating %c pos %d\n", pastPlays[curr], curr);
 		//determine which player
@@ -188,7 +191,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 		abbrev[1] = pastPlays[curr+2];
 		abbrev[2] = '\0';
 		if (p == PLAYER_DRACULA) {
-			printf("evaluating dracs move: %s\n",abbrev);
+			//printf("evaluating dracs move: %s\n",abbrev);
 			if (!strcmp("C?",abbrev)) addTrail(g,p,CITY_UNKNOWN);
 			else if (!strcmp("S?",abbrev)) {
 				addTrail(g,p,SEA_UNKNOWN);
@@ -196,7 +199,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 			} else if (!strcmp("HI",abbrev)) addTrail(g,p,HIDE);
 			else if (abbrev[0] == 'D') {
 				int backID =  abbrev[1] - '0';
-				printf("doubling back to %c %d\n", abbrev[1],backID);
+				//printf("doubling back to %c %d\n", abbrev[1],backID);
 				addTrail(g,p,102+backID);
 				if(SEA_UNKNOWN == g->trails[PLAYER_DRACULA][backID]) g->health[PLAYER_DRACULA] -= 2;
 				else if (SEA == idToType(g->trails[PLAYER_DRACULA][backID])) g->health[PLAYER_DRACULA] -= 2;
@@ -225,7 +228,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 		
 		if (p==PLAYER_DRACULA) {
 			g->score--;
-				printf("drac ends turn at %d<============\n", getLocation(g,PLAYER_DRACULA));
+				//printf("drac ends turn at %d<============\n", getLocation(g,PLAYER_DRACULA));
 		}
 		
 		curr += 8;
@@ -260,7 +263,7 @@ Round getRound(GameView currentView)
 // Get the id of current player - ie whose turn is it?
 PlayerID getCurrentPlayer(GameView currentView)
 {
-	return currentView->turnNum%5;
+	return (currentView->turnNum)%5;
 }
 
 // Get the current score
@@ -352,7 +355,7 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
 		}
 	}
 	
-	showQueue(locQ);
+	//showQueue(locQ);
 	
 	*numLocations = makeList(edges, locQ);
 	
@@ -364,10 +367,11 @@ int makeList(int *locs, Queue q)
 	int i = 0;
 	//printf("final list is:\n");
 	while(!QueueIsEmpty(q)) {
-		LocationID val = QueueLeave(q);
-		if(!inArray(locs, val)) {
-			printf("%s\n",idToName(val));
-			locs[i] = val;
+		LocationID loc = QueueLeave(q);
+		if(!inArray(locs, loc)) {
+			//printf("%s ",idToName(loc));
+			locs[i] = loc;
+			//printf("%d\n",locs[i]);
 			i++;
 		}
 	}

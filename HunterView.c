@@ -118,10 +118,11 @@ LocationID *whereCanTheyGo(HunterView currentView, int *numLocations,
 void getMessages(HunterView h, PlayerMessage *messages)
 {
 	int i;
-	int round = giveMeTurnNum(h);
-	for (i=0;i<round;i++) {
-		printf("message[%d]: %s\n",i,h->stored_messages[i]);
+	int turn = giveMeTurnNum(h);
+	for (i=0;i<turn;i++) {
+		//printf("message[%d]: %s\n",i,h->stored_messages[i]);
 		strncpy(messages[i], h->stored_messages[i], MESSAGE_SIZE);
+		//printf("message[%d]: %s\n",i,messages[i]);
 	}
 }
 
@@ -138,7 +139,7 @@ Graph getHunterMap (HunterView h)
 
 // find a path between two vertices using breadth-first traversal
 // only allow edges whose weight is less than "max"
-int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea)
+int findHunterPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea)
 {
 	int tmp_city = src;
 	// Temporary store of path_distance for calculations
@@ -157,11 +158,15 @@ int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rai
 	// While Queue is not empty and the tmp_city is not the destination city (e.g. when path to destination city from src is found)
 	while (QueueIsEmpty(cityQ) == 0 && tmp_city != dest) {
 		tmp_city = QueueLeave(cityQ);
-		int *num_locs = NULL;
-		int *locs = whereCanTheyGo(h,num_locs,whoAmI(h),road,rail,sea);
+		
+		int num_locs;
+		int *locs = connectedLocations(h->view, &num_locs,tmp_city, whoAmI(h), giveMeTheRound(h),road,rail,sea);
+		
 		int i;
-		for (i=0;i<*num_locs;i++) {
-			if (!visited[tmp_city]) {
+		for (i=0;i<num_locs;i++) {
+			
+		
+			if (!visited[locs[i]]) {
 				QueueJoin(cityQ, locs[i]);
 				prev[locs[i]] = tmp_city;
 				visited[locs[i]] = 1;
@@ -173,11 +178,11 @@ int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rai
 
 			// Calculating size of path
 			int index = locs[i];
-			while (locs[i] != src) {
+			while (index != src) {
 				index = prev[index];
 				path_distance++;
 			}
-
+		
 			// Building path array, storing destination first
 			tmp_distance = path_distance-1;
 			path[tmp_distance] = dest;
