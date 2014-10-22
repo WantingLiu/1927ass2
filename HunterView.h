@@ -122,6 +122,6 @@ int giveMeTurnNum(HunterView h);
 
 Graph getHunterMap (HunterView h);
 
-int findPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea);
+int findHunterPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea);
 
 #endif

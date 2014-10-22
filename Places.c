@@ -139,6 +139,6 @@ int abbrevToID(char *abbrev)
 
 char *idToAbbrev(int place)
 {
-	assert (place>MIN_MAP_LOCATION && place<MAX_MAP_LOCATION);
+	assert (place>MIN_MAP_LOCATION-1 && place<MAX_MAP_LOCATION);
 	return places[place].abbrev;
 }
