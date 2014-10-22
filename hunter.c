@@ -94,7 +94,7 @@ void decideHunterMove(HunterView gameState)
 // generate a random move where no hunter currently is
 int makeRandomMove(HunterView h)
 {
-	int numLocations = NULL;
+	int numLocations;
 	int *locs = whereCanIGo(h,&numLocations,TRUE,TRUE,FALSE);
 	int selectRandIndex = (rand()%(numLocations-1))+1; //so we don't select current loc (element 0)
 	return locs[selectRandIndex];
@@ -273,7 +273,7 @@ int makeFollowerMove (HunterView h, int player, int rank)
 
 int getRank(HunterView h, int player, int round)
 {
-	int rank;
+	int rank = 0;
 	
 	if (round == 0) {
 		if(player == PLAYER_LORD_GODALMING) {rank = -1;}
