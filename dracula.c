@@ -16,10 +16,11 @@ void decideDraculaMove(DracView gameState)
 	LocationID bestPlay = CASTLE_DRACULA;
 	// Getting locations Dracula can go to
 
-
 	if (giveMeTheRound(gameState) == 0) {
 		bestPlay = ATHENS;
 	} else {
+	
+	
 		int numLocations;
 		int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
 
@@ -56,14 +57,22 @@ void decideDraculaMove(DracView gameState)
 					bestPlay = paths[i];
 				}
 			}
+			// printf("bestPlay:%s\n", idToAbbrev(bestPlay));
 		} else if (numLocations == 0) {
 			bestPlay = CASTLE_DRACULA;
 		}
 	}
+	
+	int trail[TRAIL_SIZE];
+	giveMeTheTrail(gameState, PLAYER_DRACULA, trail);
+	
+	 
 
-
-
-   registerBestPlay(idToAbbrev(bestPlay), "");
+	if (trail[0] == bestPlay) {
+		registerBestPlay("HI", "");
+	} else {
+		registerBestPlay(idToAbbrev(bestPlay), "");
+	}
    
    /*
    
@@ -86,6 +95,35 @@ void decideDraculaMove(DracView gameState)
    
    */
 }
+
+int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
+	int i;
+	int isIn = 0;
+	for (i = 0; i < TRAIL_SIZE; i++) {
+		if (bestPlay == trail[i]) {
+			isIn = 1;
+		}	
+	}
+	return isIn;
+}
+
+char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
+	int i;
+	int howFarBack;
+	int hasHide = 0;
+	
+	if (hasHide) {
+		for (i = 0; i < TRAIL_SIZE; i++) {
+			
+		
+		
+		}
+	}
+	
+	
+	return "";
+}
+
 
 /*static int dracRandomMove(DracView gameState)
 {

@@ -258,6 +258,8 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
     } else if (hide == TRUE) {
         // Do nothing, can double back to any position on the trail
     }
+    
+    printf("trail[0]:%d\n", trail[0]);
 
     return edges;
 }

@@ -45,6 +45,7 @@ static char latestMessage[MESSAGE_SIZE] = "";
 
 int main(int argc, char *argv[])
 {
+	printf("check\n");
 #ifdef I_AM_DRACULA
    DracView gameState;
    char *plays = "GZA.... SED.... HZU.... MZU....";
@@ -54,8 +55,21 @@ int main(int argc, char *argv[])
    disposeDracView(gameState);
 #else
    HunterView gameState;
-   char *plays = "GED.... SLE.... HBS.... MBA.... DZA.... GIO.... SZA....";
-   PlayerMessage msgs[7] = {"0 . -1 -1","0 . 0 -1","0 . 1 -1","0 . 2 -1","Mwahahaha","1 . 3 -1","0 . 1 -1"};
+   char *plays = "GED.... SBO.... HCD.... MMI.... DC?.V.. GMN.... SBB.... HGA.... MMR.... DC?T... GLO....";
+   PlayerMessage msgs[20] = {
+    "0 . -1 -1",
+    "0 . 0 -1",
+    "0 . 1 -1",
+    "0 . 2 -1",
+    "",
+    "1 . 3 -1",
+    "0 . 1 -1",
+    "0 . 2 -1",
+    "0 . 3 -1",
+    "",
+    "2 . 4 -1"
+  };
+
    gameState = newHunterView(plays,msgs);
    decideHunterMove(gameState);
    disposeHunterView(gameState);

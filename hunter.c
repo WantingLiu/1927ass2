@@ -57,20 +57,23 @@ PlayerMessage *messages;
 
 void decideHunterMove(HunterView gameState)
 {
+
 	int turn = giveMeTurnNum(gameState);
 	//don't need to malloc as PlayerMessage is a type of char[100]
 	messages = malloc(sizeof(PlayerMessage)*turn);
 	getMessages(gameState,messages);
-	
 	//what is this line for
 	srand(time(NULL));
 	
-	int move = 0;
+
 	int current_player = whoAmI(gameState);
 	//initialises current_leader global variable
 	int current_round = giveMeTheRound(gameState);
 	int current_rank = getRank(gameState, current_player, current_round);
-	PlayerMessage message;
+	PlayerMessage message = "";
+
+	int move;
+	char *moveTo;
 
 	if (current_round == 0) {
 		if(current_player == PLAYER_LORD_GODALMING) {move = PLAYER1_START_POS;}
@@ -78,16 +81,29 @@ void decideHunterMove(HunterView gameState)
 		else if(current_player == PLAYER_VAN_HELSING) {move = PLAYER3_START_POS;}
 		else if(current_player == PLAYER_MINA_HARKER) {move = PLAYER4_START_POS;}
 		else printf("I am noone..\n");
+		makeMessageFollower(gameState, current_player, message);
 	} else if (current_player == current_leader) {
 		printf("I am the leader\n");
+		move = makeRandomMove2(gameState,current_player);
+		moveTo = idToAbbrev(move);
+		registerBestPlay(moveTo,message);
+		
+		
 		move = makeLeaderMove(gameState,message);
 	} else {
 		printf("I am a follower\n");
+		move = makeRandomMove2(gameState,current_player);
+		moveTo = idToAbbrev(move);
+		registerBestPlay(moveTo,message);
+		
+		
 		move = makeFollowerMove(gameState, current_player, current_rank);
 		makeMessageFollower(gameState, current_player, message);
 	}
 	
-	char *moveTo = idToAbbrev(move);
+	printf("move is %d\n",move);
+	
+	moveTo = idToAbbrev(move);
 	registerBestPlay(moveTo,message);
 }
 
@@ -131,10 +147,13 @@ LocationID makeLeaderMove (HunterView h, char *out)
 	int move;
 	
 	int ignore;
+	
 	char incode;
 	char outcode;
+	
 	int inactionTurns;
 	int outactionTurns;
+	
 	int intarget;
 	int outtarget;
 	
@@ -162,7 +181,7 @@ LocationID makeLeaderMove (HunterView h, char *out)
 		outactionTurns = inactionTurns+1;
 		outcode = '.';
 		outtarget = dracTrail[5];
-	} else if (inactionTurns == EXPLODE_TURNS) { //rest
+	} else if (incode == 'E' && inactionTurns == EXPLODE_TURNS) { //rest
 		printf("explode got nowhere. Resting!\n");
 		move = whereIs(h,player);
 		outactionTurns = 0;
@@ -204,8 +223,8 @@ LocationID makeLeaderMove (HunterView h, char *out)
 	//GENERATES outscore
 	int inscore;
 	int outscore;
-	if(giveMeTheRound(h) == 0) {
-		outscore = 0;
+	if(giveMeTheRound(h) == 1 && player == PLAYER_LORD_GODALMING) {
+		outscore = 3;
 	} else {
 		int currLoc;
 		if (player == PLAYER_LORD_GODALMING) currLoc = whereIs(h,PLAYER_MINA_HARKER);
@@ -225,19 +244,16 @@ LocationID makeLeaderMove (HunterView h, char *out)
 	
 		int ignore1;
 		char ignore2;
-		int offset;
+		int ignore3;
 		
 		if (!foundDrac) {
-			printf("no one is on drac's trail\n");
-			if (player == PLAYER_LORD_GODALMING) offset = turn-2;
-			else 								 offset = turn-1;
-			
-			sscanf(messages[offset],"%d %c %d",&ignore1,&ignore2,&inscore);
+			printf("no one is on drac's trail\n");			
+			sscanf(messages[turn-NUM_PLAYERS],"%d %c %d %d",&ignore1,&ignore2,&inscore,&ignore3);
 			outscore = inscore + 1;
 		}
 	}
 	
-	
+	printf("inscore: %d outscore: %d\n",inscore,outscore);
 	sprintf(out,"%d %c %d %d",outactionTurns,outcode,outscore,outtarget);
 	
 	return move;
@@ -257,12 +273,17 @@ int makeFollowerMove (HunterView h, int player, int rank)
 	} else if (isLeaderExploded(h,player)) {
 		move = explode(h,player);
 	} else {
+		
 		//make the leaders trail
 		int leader_trail[TRAIL_SIZE];
 		giveMeTheTrail(h,current_leader,leader_trail);
 		//make the path from the current player to the rank'th' element of the leaders trail
-		int path[NUM_MAP_LOCATIONS];		
+		int path[NUM_MAP_LOCATIONS];
+		while (leader_trail[rank] == -1) {
+			rank--;
+		}
 		findHunterPath(h, whereIs(h,player), leader_trail[rank], path, TRUE, TRUE, TRUE);
+		printf("I am at %d. I am rank %d. I am trying to get to %d\n",whereIs(h,player),rank,leader_trail[rank]);
 		move = path[1];
 	}
 	return move;
@@ -371,9 +392,15 @@ int isLeaderExploded (HunterView h, int player)
 //makes the message of a follower
 static void makeMessageFollower(HunterView h, int player, char *out)
 {
-	
+	int round = giveMeTheRound(h);
+	int score;
 	if(giveMeTheRound(h) == 0) {
-		sprintf(out,"0 '.' %d -1",0);
+		if(player == PLAYER_LORD_GODALMING) {score = -1;}
+		else if(player == PLAYER_DR_SEWARD) {score = 0;}
+		else if(player == PLAYER_VAN_HELSING) {score = 1;}
+		else if(player == PLAYER_MINA_HARKER) {score = 2;}
+	}else if (round == 1 && player == PLAYER_LORD_GODALMING) {
+		score = 3;
 	} else {
 		
 		int currLoc;
@@ -386,7 +413,7 @@ static void makeMessageFollower(HunterView h, int player, char *out)
 		int i;
 		for(i=0;i<TRAIL_SIZE;i++) {
 			if (currLoc == dracTrail[i]) {
-				sprintf(out,"0 '.' %d -1",i);
+				score = i;
 				foundDrac = TRUE;
 				break;
 			}
@@ -394,22 +421,16 @@ static void makeMessageFollower(HunterView h, int player, char *out)
 	
 		int ignore1;
 		char ignore2;
-		int score;
 		int ignore3;
 		
-		int offset;
 		int turn = giveMeTurnNum(h);
 
 		if (!foundDrac) {
-			if (player == PLAYER_LORD_GODALMING) {
-				offset = turn-2;
-			} else {
-				offset = turn-1;
-			}
-			sscanf(messages[offset],"%d %c %d %d",&ignore1,&ignore2,&score,&ignore3);
-			sprintf(out,"0 '.' %d -1",score+1);
+			sscanf(messages[turn-NUM_PLAYERS],"%d %c %d %d",&ignore1,&ignore2,&score,&ignore3);
+			score++;
 		}
 	}
+	sprintf(out,"0 . %d -1",score);
 }
 
 

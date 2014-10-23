@@ -101,8 +101,8 @@ char *idToName(LocationID p)
 // given a Place number, return its type
 int idToType(LocationID p)
 {
-   assert(validPlace(p));
-   return places[p].type;
+   if(validPlace(p)) return places[p].type;
+   else return -1;
 }
 
 // given a Place name, return its ID number

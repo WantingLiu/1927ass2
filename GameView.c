@@ -136,8 +136,7 @@ static int makeActionDracula(GameView g, PlayerID p, char a, int index)
 // Creates a new GameView to summarise the current state of the game
 GameView newGameView(char *pastPlays, PlayerMessage messages[])
 {
-	printf("past plays is %s\n",pastPlays);
-
+	printf("in new game\n");
 	GameView g = malloc(sizeof(struct gameView));
 	
 	g->map = newGraph(NUM_MAP_LOCATIONS);	
@@ -236,7 +235,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 	}
 	
 	EndWhile: ;
-	
+	printf("end new game\n");
 	return g;
 }
 

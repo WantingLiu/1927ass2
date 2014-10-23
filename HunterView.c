@@ -141,6 +141,11 @@ Graph getHunterMap (HunterView h)
 // only allow edges whose weight is less than "max"
 int findHunterPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea)
 {
+	if(src==dest) {
+		printf("trying to get to where you are\n");
+		path[1] = dest;
+		return 1;
+	}
 	int tmp_city = src;
 	// Temporary store of path_distance for calculations
 	int tmp_distance = 0;
@@ -198,6 +203,13 @@ int findHunterPath(HunterView h, Vertex src, Vertex dest, int *path, int road, i
 			break;
 		}
 	}
+	
+	printf("path");
+	int j;
+	for(j=0;j<path_distance;j++) {
+		printf("->%d",path[j]);
+	}
+	printf("x\n");
 	return path_distance;
 }
 
