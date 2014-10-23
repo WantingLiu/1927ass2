@@ -113,7 +113,7 @@ int makeRandomMove(HunterView h)
 {
 	printf("in make random1\n");
 	int numLocations;
-	int *locs = whereCanIGo(h,&numLocations,TRUE,TRUE,FALSE);
+	int *locs = whereCanIGo(h,&numLocations,TRUE,TRUE,TRUE);
 	int selectRandIndex = (rand()%(numLocations-1))+1; //so we don't select current loc (element 0)
 	return locs[selectRandIndex];
 }
