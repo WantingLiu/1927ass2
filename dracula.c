@@ -66,10 +66,12 @@ void decideDraculaMove(DracView gameState)
 			bestPlay = CASTLE_DRACULA;
 		}
 	}
-	
+
+
+	// Converting to double backs and hide if needed
 	int trail[TRAIL_SIZE];
 	giveMeTheTrail(gameState, PLAYER_DRACULA, trail);
-	 
+	
 
 	if (inTrail(trail, bestPlay)) {
 		registerBestPlay(convertTrail(trail, bestPlay), "");
@@ -102,7 +104,8 @@ void decideDraculaMove(DracView gameState)
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	int i;
 	int isIn = 0;
-	for (i = 0; i < TRAIL_SIZE; i++) {
+	// Doesn't include last move on the trail, can go there because it will drop off
+	for (i = 0; i < TRAIL_SIZE-1; i++) {
 		if (bestPlay == trail[i]) {
 			isIn = 1;
 		}	
@@ -129,22 +132,23 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 		for (i = 0; i < TRAIL_SIZE; i++) {
 			if (bestPlay == trail[i]) {
 				howFarBack = i;
+				break;
 			}
 		}
 		switch (i) {
-			case 1:
+			case 0:
 				converted = "D1";
 				break;
-			case 2:
+			case 1:
 				converted = "D2";
 				break;
-			case 3:
+			case 2:
 				converted = "D3";
 				break;
-			case 4:
+			case 3:
 				converted = "D4";
 				break;
-			case 5:
+			case 4:
 				converted = "D5";
 				break;
 		}
