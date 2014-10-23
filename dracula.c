@@ -19,6 +19,7 @@ void decideDraculaMove(DracView gameState)
 {
 	printf("12345\n");
 	LocationID bestPlay = CASTLE_DRACULA;
+	int teleported = 0;
 	// Getting locations Dracula can go to
 
 	if (giveMeTheRound(gameState) == 0) {
@@ -53,6 +54,7 @@ void decideDraculaMove(DracView gameState)
 			  // Finding location that is furthest away from the closest hunter
 			bestPlay = paths[0];
 			minimum = findPathDist(gameMap, closestHunter, paths[0]);
+			printf("numLocations:%d\n", numLocations);
 			for (i = 1; i < numLocations; i++) {
 				tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
 				if (tempMinimum < minimum) {
@@ -62,7 +64,8 @@ void decideDraculaMove(DracView gameState)
 			}
 			// printf("bestPlay:%s\n", idToAbbrev(bestPlay));
 		} else if (numLocations == 0) {
-			bestPlay = CASTLE_DRACULA;
+			registerBestPlay("TP", "");
+			teleported = 1;
 		}
 	}
 	printf("54321\n");
@@ -71,12 +74,11 @@ void decideDraculaMove(DracView gameState)
 	// Converting to double backs and hide if needed
 	int trail[TRAIL_SIZE];
 	giveMeTheTrail(gameState, PLAYER_DRACULA, trail);
-	
 
-	if (inTrail(trail, bestPlay)) {
+	if (inTrail(trail, bestPlay) && !teleported) {
 		printf("Here\n");
 		registerBestPlay(convertTrail(trail, bestPlay), "");
-	} else {
+	} else if (!teleported) {
 		printf("Here2\n");
 		registerBestPlay(idToAbbrev(bestPlay), "");
 	}
