@@ -58,12 +58,11 @@ void decideDraculaMove(DracView gameState)
 			printf("Paths[0]:%d\n", paths[0]);
 			for (i = 1; i < numLocations; i++) {
 				tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
-				if (tempMinimum < minimum) {
+				if (tempMinimum > minimum) {
 					minimum = tempMinimum;
 					bestPlay = paths[i];
 				}
 			}
-			// printf("bestPlay:%s\n", idToAbbrev(bestPlay));
 		} else if (numLocations == 0) {
 			registerBestPlay("TP", "");
 			teleported = TRUE;
