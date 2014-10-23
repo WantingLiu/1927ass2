@@ -395,7 +395,7 @@ int isLeaderExploded (HunterView h, int player)
 static void makeMessageFollower(HunterView h, int player, char *out)
 {
 	int round = giveMeTheRound(h);
-	int score;
+	int score = 0;
 	if(giveMeTheRound(h) == 0) {
 		if(player == PLAYER_LORD_GODALMING) {score = -1;}
 		else if(player == PLAYER_DR_SEWARD) {score = 0;}
