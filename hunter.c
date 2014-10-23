@@ -326,7 +326,7 @@ int makeFollowerMove (HunterView h, int player, int rank)
 				flag = TRUE;
 				int j;
 				for(j=0;j<NUM_PLAYERS-1;j++) {
-					if(j!=player && leader_trail[rank] == whereIs(h,j) && leader_trail[rank+1]!=-1) {
+					if(j!=player && leader_trail[rank] == whereIs(h,j) && leader_trail[rank+1]!=-1 && rank+1<TRAIL_SIZE) {
 						rank++;
 						flag = FALSE;
 					}
