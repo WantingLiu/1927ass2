@@ -202,6 +202,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
     int doubleBack = FALSE;
     // Boolean of whether hide is in the trail
     int hide = FALSE;
+    int temp = 0;
     // New set of edges if case of doubleBack or hide
     LocationID *newEdges = malloc((*numLocations)*sizeof(LocationID));
     LocationID *edges;
@@ -209,11 +210,13 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
     // Getting the trail of Dracula
     getHistory(currentView->view, PLAYER_DRACULA, trail);
 
-    int i = 0;
+    int i = 0, j = 0;
     // Case of having a double back or a hide in trail
     while (i < 6) {
         if (trail[i] >= 102 && trail[i] < 108) {
-            doubleBack = TRUE;
+            if (trail[i] > 102 && trail[i] < 108) {
+                doubleBack = TRUE;
+            }
             if (trail[i] == 102) {
                 hide = TRUE;
             }
@@ -223,35 +226,44 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
 
     // Constructing preliminary edges array
     edges = connectedLocations(currentView->view, numLocations, whereIs(currentView, PLAYER_DRACULA), PLAYER_DRACULA, getRound(currentView->view), road, FALSE, sea);
+    temp = *numLocations;
+    printf("numLocations1:%d\n", *numLocations);
+    printf("edges[1]:%d\n", edges[1]);
 
 
     // Case if double back or hide is in the trail, can't have anything in edges array that is in trail
     if (doubleBack == TRUE && hide == TRUE) {
-        for (i = 0; i < *numLocations; i++) {
+        printf("Doublebackhide\n");
+        for (i = 0; i < temp; i++) {
+            printf("looped\n");
             if (edges[i] != trail[0] && edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
-                newEdges[i] = edges[i];
+                newEdges[j] = edges[i];
+                j++;
             } else {
                 // If an invalid location is found, reduce number of locations
                 (*numLocations)--;
             }
+            printf("edges[i](loop):%d\n", edges[i]);
         }
-        free(edges);
         edges = newEdges;
     // Case if only doubleBack in trail, can't have anything in trail array apart from most recent location but only if it is not sea (can't hide there)
     } else if (doubleBack == TRUE) {
+        printf("Doubleback\n");
         // If the first move in the trail is a double back, special case
         if (trail[0] > 102 && trail[0] < 107) {
             // Calculating how far back the double back goes to
             int howFarBack = (5-(107-trail[0]));
 
-            for (i = 0; i < *numLocations; i++) {
+            for (i = 0; i < temp; i++) {
                 // If edges contains the double back location, include it since you can hide there
                 if (edges[i] == trail[howFarBack]) {
                     if (idToType(trail[howFarBack] != SEA)) {
-                        newEdges[i] = edges[i];
+                        newEdges[j] = edges[i];
+                        j++;
                     }
                 } else if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
-                    newEdges[i] = edges[i];
+                    newEdges[j] = edges[i];
+                    j++;
                 } else {
                     // If an invalid location is found, reduce number of locations
                     (*numLocations)--;
@@ -259,14 +271,17 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
             }
             
         } else {
-            for (i = 0; i < *numLocations; i++) {
+            printf("Hiiii\n");
+            for (i = 0; i < temp; i++) {
                 if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
                     if (edges[i] == trail[0]) {
                         if (idToType(trail[0]) != SEA) {
-                            newEdges[i] = edges[i];
+                            newEdges[j] = edges[i];
+                            j++;
                         }
                     } else {
-                        newEdges[i] = edges[i];
+                        newEdges[j] = edges[i];
+                        j++;
                     }
                 } else {
                     // Invalid location, reduce number of locations possible
@@ -274,12 +289,13 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
                 }
             }
         }
-        free(edges);
+        (*numLocations) = j;
         edges = newEdges;
     } else if (hide == TRUE) {
         // Do nothing, can double back to any position on the trail
     }
 
+    printf("newEdges[0]:%d\n", newEdges[0]);
     return edges;
 }
 

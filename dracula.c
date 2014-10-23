@@ -17,9 +17,8 @@ static int inTrail(int trail[TRAIL_SIZE], int bestPlay);
 
 void decideDraculaMove(DracView gameState)
 {
-	printf("12345\n");
 	LocationID bestPlay = CASTLE_DRACULA;
-	int teleported = 0;
+	int teleported = FALSE;
 	// Getting locations Dracula can go to
 
 	if (giveMeTheRound(gameState) == 0) {
@@ -27,6 +26,7 @@ void decideDraculaMove(DracView gameState)
 	} else {
 		int numLocations;
 		int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
+		printf("numLocations:%d\n", numLocations);
 
 		if (numLocations > 0) {
 			Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
@@ -55,6 +55,7 @@ void decideDraculaMove(DracView gameState)
 			bestPlay = paths[0];
 			minimum = findPathDist(gameMap, closestHunter, paths[0]);
 			printf("numLocations:%d\n", numLocations);
+			printf("Paths[0]:%d\n", paths[0]);
 			for (i = 1; i < numLocations; i++) {
 				tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
 				if (tempMinimum < minimum) {
@@ -65,10 +66,9 @@ void decideDraculaMove(DracView gameState)
 			// printf("bestPlay:%s\n", idToAbbrev(bestPlay));
 		} else if (numLocations == 0) {
 			registerBestPlay("TP", "");
-			teleported = 1;
+			teleported = TRUE;
 		}
 	}
-	printf("54321\n");
 
 
 	// Converting to double backs and hide if needed
@@ -131,9 +131,9 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	// Checking if there is a hide or double back in the trail, ignoring last element as can go there without double back and hide
 	for (i = 0; i < TRAIL_SIZE-1; i++) {
 		if (trail[i] == HIDE) {
-			hasHide = 1;
+			hasHide = TRUE;
 		} else if (trail[i] > 102 && trail[i] < 108) {
-			hasDouble = 1;
+			hasDouble = TRUE;
 		}
 	}
 
