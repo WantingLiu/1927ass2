@@ -63,10 +63,11 @@ void decideHunterMove(HunterView gameState)
 	messages = malloc(sizeof(PlayerMessage)*turn);
 	getMessages(gameState,messages);
 	//what is this line for
-	srand(time(NULL));
 	
-
+	
+	
 	int current_player = whoAmI(gameState);
+	srand(time(NULL));
 	//initialises current_leader global variable
 	int current_round = giveMeTheRound(gameState);
 	int current_rank = getRank(gameState, current_player, current_round);
@@ -110,8 +111,9 @@ void decideHunterMove(HunterView gameState)
 // generate a random move where no hunter currently is
 int makeRandomMove(HunterView h)
 {
+	printf("in make random1\n");
 	int numLocations;
-	int *locs = whereCanIGo(h,&numLocations,TRUE,TRUE,FALSE);
+	int *locs = whereCanIGo(h,&numLocations,TRUE,TRUE,TRUE);
 	int selectRandIndex = (rand()%(numLocations-1))+1; //so we don't select current loc (element 0)
 	return locs[selectRandIndex];
 }
