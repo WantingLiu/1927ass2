@@ -11,6 +11,10 @@
 
 #define MAX_EDGE_WEIGHT 100
 
+static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay);
+static int inTrail(int trail[TRAIL_SIZE], int bestPlay);
+
+
 void decideDraculaMove(DracView gameState)
 {
 	LocationID bestPlay = CASTLE_DRACULA;
@@ -65,11 +69,10 @@ void decideDraculaMove(DracView gameState)
 	
 	int trail[TRAIL_SIZE];
 	giveMeTheTrail(gameState, PLAYER_DRACULA, trail);
-	
 	 
 
-	if (trail[0] == bestPlay) {
-		registerBestPlay("HI", "");
+	if (inTrail(trail, bestPlay)) {
+		registerBestPlay(convertTrail(trail, bestPlay), "");
 	} else {
 		registerBestPlay(idToAbbrev(bestPlay), "");
 	}
@@ -96,7 +99,7 @@ void decideDraculaMove(DracView gameState)
    */
 }
 
-int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
+static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	int i;
 	int isIn = 0;
 	for (i = 0; i < TRAIL_SIZE; i++) {
@@ -107,21 +110,66 @@ int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	return isIn;
 }
 
-char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
+static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	int i;
-	int howFarBack;
+	int howFarBack = 0;
 	int hasHide = 0;
-	
-	if (hasHide) {
-		for (i = 0; i < TRAIL_SIZE; i++) {
-			
-		
-		
+	char* converted;
+
+
+	// Checking if there is a hide in the trail
+	for (i = 0; i < TRAIL_SIZE; i++) {
+		if (trail[i] == HIDE) {
+			hasHide = 1;
 		}
 	}
+
 	
-	
-	return "";
+	if (hasHide && bestPlay != trail[0]) {
+		for (i = 0; i < TRAIL_SIZE; i++) {
+			if (bestPlay == trail[i]) {
+				howFarBack = i;
+			}
+		}
+		switch (i) {
+			case 1:
+				converted = "D1";
+				break;
+			case 2:
+				converted = "D2";
+				break;
+			case 3:
+				converted = "D3";
+				break;
+			case 4:
+				converted = "D4";
+				break;
+			case 5:
+				converted = "D5";
+				break;
+		}
+	} else {
+		if (bestPlay == trail[0]) {
+			converted = "HI";
+		} else {
+			switch (i) {
+				case 2:
+					converted = "D2";
+					break;
+				case 3:
+					converted = "D3";
+					break;
+				case 4:
+					converted = "D4";
+					break;
+				case 5:
+					converted = "D5";
+					break;
+			}
+		}
+	}
+
+	return converted;
 }
 
 
