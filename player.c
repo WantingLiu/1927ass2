@@ -55,9 +55,9 @@ int main(int argc, char *argv[])
    disposeDracView(gameState);
 #else
    HunterView gameState;
-   char *plays = "GED.... SBO.... HCD.... MMI.... DC?.V.. GMN.... SBB.... HGA.... MMR.... DC?T... GLO....";
-   PlayerMessage msgs[20] = {
-    "0 . -1 -1",
+   char *plays = "GED.... SBO.... HCD.... MMI.... DC?.V.. GMN.... SBB.... HGA.... MMR.... DC?T... GED.... SAO.... HCN.... MMS.... DS?.... GMN.... SNS.... HBS.... MAO.... DTS.... GED.... SED.... HIO.... MEC.... DC?T... GMN.... SED.... HTS.... MNS.... DD2.... GED.... SMN.... HMS.... MED.... DMS..V. GNS.... SMN.... HAO....";
+   PlayerMessage msgs[100] = {
+	"0 . 49 -1",
     "0 . 0 -1",
     "0 . 1 -1",
     "0 . 2 -1",
@@ -67,7 +67,34 @@ int main(int argc, char *argv[])
     "0 . 2 -1",
     "0 . 3 -1",
     "",
-    "2 . 4 -1"
+    "2 . 4 -1",
+    "0 . 2 -1",
+    "0 . 3 -1",
+    "0 . 4 -1",
+    "+++Oneoneoneoneoneoneone+++",
+    "3 . 5 -1",
+    "0 . 3 -1",
+    "0 . 4 -1",
+    "0 . 5 -1",
+    "+++MELON MELON MELON+++",
+    "4 . 6 -1",
+    "0 . 4 -1",
+    "0 . 5 -1",
+    "0 . 6 -1",
+    "+++MELON MELON MELON+++",
+    "5 . 7 -1",
+    "0 . 5 -1",
+    "0 . 6 -1",
+    "0 . 7 -1",
+    "+++Whoops! Here Comes The Cheese!+++",
+    "6 . 8 64",
+    "0 . 6 -1",
+    "0 . 7 -1",
+    "0 . 8 -1",
+    "+++Oneoneoneoneoneoneone+++",
+    "7 . 9 43",
+    "0 . 7 -1",
+    "0 . 8 -1"
   };
 
    gameState = newHunterView(plays,msgs);
