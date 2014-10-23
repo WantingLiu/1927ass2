@@ -112,7 +112,7 @@ static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	// Doesn't include last move on the trail, can go there because it will drop off
 	for (i = 0; i < TRAIL_SIZE-1; i++) {
 		if (bestPlay == trail[i]) {
-			isIn = 1;
+			isIn = TRUE;
 		}	
 	}
 	return isIn;
@@ -122,9 +122,9 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 
 	int i;
 
-	int hasHide = 0;
-	int hasDouble = 0;
-	int howFarBack = 0;
+	int hasHide = FALSE;
+	int hasDouble = FALSE;
+	int howFarBack = FALSE;
 	char* converted = "";
 
 
