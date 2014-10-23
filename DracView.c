@@ -256,6 +256,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
                     (*numLocations)--;
                 }
             }
+            
         } else {
             for (i = 0; i < *numLocations; i++) {
                 if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
