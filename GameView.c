@@ -318,8 +318,7 @@ LocationID *connectedLocations(GameView currentView, int *numLocations,
 	for (c=0;c<NUM_MAP_LOCATIONS;c++) {
 		edges[c] = -1;
 	}
-	
-	LocationID to;
+	LocationID to = 0;
 	Queue locQ = newQueue();
 	QueueJoin(locQ,from);
 	for (to=0;to<getnV(currentView->map);to++) {

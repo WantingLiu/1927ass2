@@ -220,9 +220,11 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
         } 
         i++;
     }
+
     // Constructing preliminary edges array
     edges = connectedLocations(currentView->view, numLocations, whereIs(currentView, PLAYER_DRACULA), PLAYER_DRACULA, getRound(currentView->view), road, FALSE, sea);
-    
+
+
     // Case if double back or hide is in the trail, can't have anything in edges array that is in trail
     if (doubleBack == TRUE && hide == TRUE) {
         for (i = 0; i < *numLocations; i++) {
