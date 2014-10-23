@@ -115,27 +115,36 @@ static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 
 static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	int i;
-	int howFarBack = 0;
 	int hasHide = 0;
-	char* converted;
+	int hasDouble = 0;
+	int howFarBack = 0;
+	char* converted = "";
 
 
-	// Checking if there is a hide in the trail
-	for (i = 0; i < TRAIL_SIZE; i++) {
+	// Checking if there is a hide or double back in the trail, ignoring last element as can go there without double back and hide
+	for (i = 0; i < TRAIL_SIZE-1; i++) {
 		if (trail[i] == HIDE) {
 			hasHide = 1;
+		} else if (trail[i] > 102 && trail[i] < 108) {
+			hasDouble = 1;
 		}
 	}
 
-	
-	if (hasHide && bestPlay != trail[0]) {
-		for (i = 0; i < TRAIL_SIZE; i++) {
-			if (bestPlay == trail[i]) {
-				howFarBack = i;
-				break;
-			}
+	for (i = 0; i < TRAIL_SIZE-1; i++) {
+		if (bestPlay == trail[i]) {
+			howFarBack = i;
+			break;
 		}
-		switch (i) {
+	}
+
+	// if there is a double back in the first place of the trail, if there is a double back means there is no hide
+	// If double back is first move, hide can potentially be used 
+
+	// If there is a double back in trail and the bestPlay is also in the trail, has to mean hide
+	if (hasDouble) {
+		converted = "HI";
+	} else if (hasHide) {
+		switch (howFarBack) {
 			case 0:
 				converted = "D1";
 				break;
@@ -151,25 +160,6 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 			case 4:
 				converted = "D5";
 				break;
-		}
-	} else {
-		if (bestPlay == trail[0]) {
-			converted = "HI";
-		} else {
-			switch (i) {
-				case 2:
-					converted = "D2";
-					break;
-				case 3:
-					converted = "D3";
-					break;
-				case 4:
-					converted = "D4";
-					break;
-				case 5:
-					converted = "D5";
-					break;
-			}
 		}
 	}
 

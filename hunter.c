@@ -72,7 +72,7 @@ void decideHunterMove(HunterView gameState)
 	int current_rank = getRank(gameState, current_player, current_round);
 	PlayerMessage message = "";
 
-	int move;
+	int move = 0;
 	char *moveTo;
 
 	if (current_round == 0) {
@@ -221,8 +221,8 @@ LocationID makeLeaderMove (HunterView h, char *out)
 	
 	
 	//GENERATES outscore
-	int inscore;
-	int outscore;
+	int inscore = 0;
+	int outscore = 0;
 	if(giveMeTheRound(h) == 1 && player == PLAYER_LORD_GODALMING) {
 		outscore = 3;
 	} else {

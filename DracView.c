@@ -239,18 +239,37 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
         edges = newEdges;
     // Case if only doubleBack in trail, can't have anything in trail array apart from most recent location but only if it is not sea (can't hide there)
     } else if (doubleBack == TRUE) {
-        for (i = 0; i < *numLocations; i++) {
-            if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
-                if (edges[i] == trail[1]) {
-                    if (idToType(trail[1]) != SEA) {
+        // If the first move in the trail is a double back, special case
+        if (trail[0] > 102 && trail[0] < 107) {
+            // Calculating how far back the double back goes to
+            int howFarBack = (5-(107-trail[0]));
+
+            for (i = 0; i < *numLocations; i++) {
+                // If edges contains the double back location, include it since you can hide there
+                if (edges[i] == trail[howFarBack]) {
+                    if (idToType(trail[howFarBack] != SEA)) {
+                        newEdges[i] = edges[i];
+                    }
+                } else if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
+                    newEdges[i] = edges[i];
+                } else {
+                    (*numLocations)--;
+                }
+            }
+        } else {
+            for (i = 0; i < *numLocations; i++) {
+                if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
+                    if (edges[i] == trail[0]) {
+                        if (idToType(trail[0]) != SEA) {
+                            newEdges[i] = edges[i];
+                        }
+                    } else {
                         newEdges[i] = edges[i];
                     }
                 } else {
-                    newEdges[i] = edges[i];
+                    // Invalid location, reduce number of locations possible
+                    (*numLocations)--;
                 }
-            } else {
-                // Invalid location, reduce number of locations possible
-                (*numLocations)--;
             }
         }
         free(edges);
