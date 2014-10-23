@@ -17,14 +17,13 @@ static int inTrail(int trail[TRAIL_SIZE], int bestPlay);
 
 void decideDraculaMove(DracView gameState)
 {
+	printf("12345\n");
 	LocationID bestPlay = CASTLE_DRACULA;
 	// Getting locations Dracula can go to
 
 	if (giveMeTheRound(gameState) == 0) {
 		bestPlay = ATHENS;
 	} else {
-	
-	
 		int numLocations;
 		int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
 
@@ -66,6 +65,7 @@ void decideDraculaMove(DracView gameState)
 			bestPlay = CASTLE_DRACULA;
 		}
 	}
+	printf("54321\n");
 
 
 	// Converting to double backs and hide if needed
@@ -74,8 +74,10 @@ void decideDraculaMove(DracView gameState)
 	
 
 	if (inTrail(trail, bestPlay)) {
+		printf("Here\n");
 		registerBestPlay(convertTrail(trail, bestPlay), "");
 	} else {
+		printf("Here2\n");
 		registerBestPlay(idToAbbrev(bestPlay), "");
 	}
    
@@ -161,6 +163,29 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 			case 4:
 				converted = "D5";
 				break;
+		}
+	} else {
+		// If there is neither hide or double back in trail
+		if (trail[0] == bestPlay) {
+			converted = "HI";
+		} else {
+			switch (howFarBack) {
+				case 0:
+					converted = "D1";
+					break;
+				case 1:
+					converted = "D2";
+					break;
+				case 2:
+					converted = "D3";
+					break;
+				case 3:
+					converted = "D4";
+					break;
+				case 4:
+					converted = "D5";
+					break;
+			}
 		}
 	}
 
