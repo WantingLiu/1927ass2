@@ -37,7 +37,6 @@ int makeList(int *locs, Queue q);
 static void addTrail(GameView g, PlayerID p, LocationID loc);
 static void addEncounter(GameView g, LocationID loc);
 static void removeEncounter(GameView g, PlayerID p);
-static int getIsDead(GameView currentView, PlayerID player);
 //===============================
 //			Static Functions
 //===============================
@@ -136,7 +135,6 @@ static int makeActionDracula(GameView g, PlayerID p, char a, int index)
 // Creates a new GameView to summarise the current state of the game
 GameView newGameView(char *pastPlays, PlayerMessage messages[])
 {
-	printf("in new game\n");
 	GameView g = malloc(sizeof(struct gameView));
 	
 	g->map = newGraph(NUM_MAP_LOCATIONS);	
@@ -235,7 +233,7 @@ GameView newGameView(char *pastPlays, PlayerMessage messages[])
 	}
 	
 	EndWhile: ;
-	printf("end new game\n");
+
 	return g;
 }
 
@@ -278,7 +276,7 @@ int getHealth(GameView currentView, PlayerID player)
 	return currentView->health[player];
 }
 
-static int getIsDead(GameView currentView, PlayerID player)
+int getIsDead(GameView currentView, PlayerID player)
 {
 	if (currentView->health[player] < 1) return TRUE;
 	return FALSE;

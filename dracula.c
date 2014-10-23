@@ -101,7 +101,7 @@ void decideDraculaMove(DracView gameState)
    */
 }
 
-/*
+
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	int i;
 	int isIn = 0;
@@ -115,8 +115,9 @@ static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 }
 
 static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
+
 	int i;
-	int howFarBack = 0;
+	
 	int hasHide = 0;
 	char* converted;
 
@@ -132,7 +133,6 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	if (hasHide && bestPlay != trail[0]) {
 		for (i = 0; i < TRAIL_SIZE; i++) {
 			if (bestPlay == trail[i]) {
-				howFarBack = i;
 				break;
 			}
 		}
@@ -177,7 +177,7 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	return converted;
 }
 
-*/
+
 /*static int dracRandomMove(DracView gameState)
 {
    int* numLocations = NULL;
