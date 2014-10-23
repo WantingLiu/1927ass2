@@ -15,7 +15,8 @@
 #define PLAYER4_START_POS 44
 
 #define SCORE_UNTIL_EXPLODE 10
-#define EXPLODE_TURNS 8
+#define EXPLODE_TURNS 4
+#define TURNS_UNTIL_REST 7
 
 
 int makeRandomMove(HunterView g);
@@ -24,7 +25,7 @@ LocationID makeLeaderMove (HunterView h, char *out);
 int makeFollowerMove (HunterView g, int player, int rank);
 int getRank(HunterView h, int player, int round);
 int isLeaderExploded (HunterView h, int player);
-int isLeaderRested (HunterView h);
+int isLeaderRested (HunterView h, int player);
 
 //static void makeMessage(HunterView h, int player, char *out);
 //static char makeLeaderBehaviourCode (HunterView h);
@@ -73,7 +74,30 @@ void decideHunterMove(HunterView gameState)
 	int current_rank = getRank(gameState, current_player, current_round);
 	PlayerMessage message = "";
 
-	int move = 0;
+	int leader_trail[TRAIL_SIZE];
+	giveMeTheTrail(gameState,current_leader,leader_trail);
+
+	printf("current leader is %d\n",current_leader);
+
+	printf("LT->");
+	int j;
+	for (j=0;j<TRAIL_SIZE;j++){
+		printf("%d->",leader_trail[j]);
+	}
+	printf("x\n");
+	
+	int drac_trail[TRAIL_SIZE];
+	giveMeTheTrail(gameState,PLAYER_DRACULA,drac_trail);
+
+	printf("DT->");
+	int m;
+	for (m=0;m<TRAIL_SIZE;m++){
+		printf("%d->",drac_trail[m]);
+	}
+	printf("x\n");	
+
+	int move;
+
 	char *moveTo;
 
 	if (current_round == 0) {
@@ -92,11 +116,11 @@ void decideHunterMove(HunterView gameState)
 		
 		move = makeLeaderMove(gameState,message);
 	} else {
-		printf("I am a follower\n");
+		printf("I am a follower");
 		move = makeRandomMove2(gameState,current_player);
 		moveTo = idToAbbrev(move);
 		registerBestPlay(moveTo,message);
-		
+		printf(" and I am making a move\n");
 		
 		move = makeFollowerMove(gameState, current_player, current_rank);
 		makeMessageFollower(gameState, current_player, message);
@@ -111,7 +135,6 @@ void decideHunterMove(HunterView gameState)
 // generate a random move where no hunter currently is
 int makeRandomMove(HunterView h)
 {
-	printf("in make random1\n");
 	int numLocations;
 	int *locs = whereCanIGo(h,&numLocations,TRUE,TRUE,TRUE);
 	int selectRandIndex = (rand()%(numLocations-1))+1; //so we don't select current loc (element 0)
@@ -170,21 +193,25 @@ LocationID makeLeaderMove (HunterView h, char *out)
 	
 	//GENERATES move, outactionturns, outcode and out target
 	if (incode == 'E' && inactionTurns < EXPLODE_TURNS) {//continue exploding
-		printf("continue explode\n");
+		printf("Continue explode\n");
 		move = explode(h,player);
 		outactionTurns = inactionTurns+1;
 		outcode = 'E';
 		outtarget = -1;
 	} else if (incode == 'R') { //after a rest, reset target to that location
-		printf("locking onto drac\n");
-		int path[NUM_MAP_LOCATIONS];
-		findHunterPath(h, myLoc, dracTrail[5], path, TRUE, TRUE, TRUE);
-		move = path[0];
+		printf("Locking onto drac\n");
+		if (dracTrail[5] >= MIN_MAP_LOCATION && dracTrail[5] <= MAX_MAP_LOCATION) {
+			int path[NUM_MAP_LOCATIONS];
+			findHunterPath(h, myLoc, dracTrail[5], path, TRUE, TRUE, TRUE);
+			move = path[1];
+		} else {
+			move = makeRandomMove2(h,player);
+		}
 		outactionTurns = inactionTurns+1;
 		outcode = '.';
 		outtarget = dracTrail[5];
 	} else if (incode == 'E' && inactionTurns == EXPLODE_TURNS) { //rest
-		printf("explode got nowhere. Resting!\n");
+		printf("Explode got nowhere. Resting!\n");
 		move = whereIs(h,player);
 		outactionTurns = 0;
 		outcode = 'R';
@@ -195,7 +222,13 @@ LocationID makeLeaderMove (HunterView h, char *out)
 		outactionTurns = 0;
 		outcode = 'E';
 		outtarget = -1;
-	} else {
+	} else if (incode == '.' && inactionTurns == TURNS_UNTIL_REST) { //rest
+		printf("Dracula has escaped. I need to research!\n");
+		move = whereIs(h,player);
+		outactionTurns = 0;
+		outcode = 'R';
+		outtarget = -1;
+	}  else {
 		printf("Business as usual\n");
 		
 		int tmpLoc = -1;
@@ -239,7 +272,7 @@ LocationID makeLeaderMove (HunterView h, char *out)
 			if (currLoc == dracTrail[i]) {
 				outscore = i;
 				foundDrac = TRUE;
-				printf("someone is on drac's trail[%d] location: %d\n",i,currLoc);
+				//printf("someone is on drac's trail[%d] location: %d\n",i,currLoc);
 				break;
 			}
 		}
@@ -249,13 +282,12 @@ LocationID makeLeaderMove (HunterView h, char *out)
 		int ignore3;
 		
 		if (!foundDrac) {
-			printf("no one is on drac's trail\n");			
+			//printf("no one is on drac's trail\n");			
 			sscanf(messages[turn-NUM_PLAYERS],"%d %c %d %d",&ignore1,&ignore2,&inscore,&ignore3);
 			outscore = inscore + 1;
 		}
 	}
 	
-	printf("inscore: %d outscore: %d\n",inscore,outscore);
 	sprintf(out,"%d %c %d %d",outactionTurns,outcode,outscore,outtarget);
 	
 	return move;
@@ -268,24 +300,41 @@ LocationID makeLeaderMove (HunterView h, char *out)
 int makeFollowerMove (HunterView h, int player, int rank)
 {
 	int move;
-	if (isLeaderRested(h)) {
+	if (isLeaderRested(h,player)) {
 		printf("Leader is rested\n");
 		//rest as well
 		move = whereIs(h, player);
 	} else if (isLeaderExploded(h,player)) {
+		printf("Leader EXPLODED!\n");
 		move = explode(h,player);
 	} else {
-		
+		printf("Conga Conga Conga!\n");
 		//make the leaders trail
 		int leader_trail[TRAIL_SIZE];
 		giveMeTheTrail(h,current_leader,leader_trail);
 		//make the path from the current player to the rank'th' element of the leaders trail
 		int path[NUM_MAP_LOCATIONS];
-		while (leader_trail[rank] == -1) {
-			rank--;
+
+		int flag = FALSE;
+
+		if(leader_trail[rank] == -1) {
+			while (leader_trail[rank] == -1) {
+				rank--;
+			}
+		} else {
+			while(!flag) {
+				flag = TRUE;
+				int j;
+				for(j=0;j<NUM_PLAYERS-1;j++) {
+					if(j!=player && leader_trail[rank] == whereIs(h,j) && leader_trail[rank+1]!=-1 && rank+1<TRAIL_SIZE) {
+						rank++;
+						flag = FALSE;
+					}
+				}
+			}
 		}
 		findHunterPath(h, whereIs(h,player), leader_trail[rank], path, TRUE, TRUE, TRUE);
-		printf("I am at %d. I am rank %d. I am trying to get to %d\n",whereIs(h,player),rank,leader_trail[rank]);
+		//printf("I am at %d. I am rank %d. I am trying to get to %d\n",whereIs(h,player),rank,leader_trail[rank]);
 		move = path[1];
 	}
 	return move;
@@ -363,29 +412,44 @@ void makeRank
 */
 //-===================================================-//
 
-int isLeaderRested (HunterView h)
-{
-	int leader_trail[TRAIL_SIZE];
-	giveMeTheTrail(h,current_leader,leader_trail);
-	if (leader_trail[0] == leader_trail[1])	return TRUE;
-	return FALSE;
+int isLeaderRested (HunterView h, int player)
+{	
+	int turn = giveMeTurnNum(h);
+	
+	int ignore1;
+	char code;
+	int ignore2;
+	int ignore3;
+	int offset;
+	
+	if(current_leader<player) { //before drac
+		offset = turn-player+current_leader;
+	} else { //need to skip drac
+		offset = turn-5-player+current_leader;
+	}
+	sscanf(messages[offset],"%d %c %d %d",&ignore1,&code,&ignore2,&ignore3);
+	
+	return (code=='R');
 }
 
 int isLeaderExploded (HunterView h, int player)
 {	
 	int turn = giveMeTurnNum(h);
-	char tmp;
-	int ignore;
+	
+	int ignore1;
+	char code;
+	int ignore2;
+	int ignore3;
 	int offset;
 	
 	if(current_leader<player) { //before drac
-		offset = turn-3+current_leader;
+		offset = turn-player+current_leader;
 	} else { //need to skip drac
-		offset = turn-4+current_leader;
+		offset = turn-5-player+current_leader;
 	}
-	sscanf(messages[offset],"%c%n",&tmp,&ignore);
+	sscanf(messages[offset],"%d %c %d %d",&ignore1,&code,&ignore2,&ignore3);
 	
-	return (tmp=='E');
+	return (code=='E');
 }
 
 //-===================================================-//
@@ -460,6 +524,7 @@ static LocationID explode(HunterView h, int player)
 	LocationID move;
 	
 	if (player == whoIsClosestToCastle(h)) {
+		printf("I am the closest to Dracula's foul castle!\n");
 		move = explodeToCastle(h, player);
 	} else {
 		move = bestExplodeMove(h,player);
@@ -485,16 +550,17 @@ static LocationID bestExplodeMove (HunterView g, int currPlayer)
 		sumDist = 0;
 		PlayerID p;
 		for (p=0; p<(NUM_PLAYERS-1); p++) {
-			if (p!=currPlayer) {
+			if (p!=currPlayer && p!=current_leader) {
 				sumDist += findPathDist(getHunterMap(g), moveOption, whereIs(g, p));
 			}
 		}
+		if (sumDist >= maxDist) {
+			bestMove = moveOption;
+			maxDist = sumDist;
+		}
 	}
 
-	if (sumDist > maxDist) {
-		bestMove = moveOption;
-		maxDist = sumDist;
-	}
+
 
 	return bestMove;
 }
@@ -505,7 +571,7 @@ static LocationID explodeToCastle (HunterView g, PlayerID player)
 	LocationID path[NUM_MAP_LOCATIONS];
 	findHunterPath(g, whereIs(g,player), CASTLE_DRACULA, path, TRUE, TRUE, TRUE);
 
-	return path[0];
+	return path[1];
 }
 
 //returns the playerID of the player whose position is closest to CASTLE_DRACULA

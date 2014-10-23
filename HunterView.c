@@ -137,10 +137,16 @@ Graph getHunterMap (HunterView h)
 	return getGameMap(h->view);
 }
 
+int isHunterDead(HunterView h, int player)
+{
+	return getIsDead(h->view,player);
+}
+
 // find a path between two vertices using breadth-first traversal
 // only allow edges whose weight is less than "max"
 int findHunterPath(HunterView h, Vertex src, Vertex dest, int *path, int road, int rail, int sea)
 {
+	printf("finding path from %d to %d\n",src,dest);
 	if(src==dest) {
 		printf("trying to get to where you are\n");
 		path[1] = dest;
@@ -204,12 +210,14 @@ int findHunterPath(HunterView h, Vertex src, Vertex dest, int *path, int road, i
 		}
 	}
 	
-	printf("path");
+	
+	printf("path->");
 	int j;
 	for(j=0;j<path_distance;j++) {
-		printf("->%d",path[j]);
+		printf("%d->",path[j]);
 	}
 	printf("x\n");
+	
 	return path_distance;
 }
 

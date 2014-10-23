@@ -134,4 +134,6 @@ int giveMeTurnNumber(GameView g);
 //returns the map so that people can look at it
 Graph getGameMap (GameView g);
 
+int getIsDead(GameView currentView, PlayerID player);
+
 #endif

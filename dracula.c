@@ -119,7 +119,9 @@ static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 }
 
 static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
+
 	int i;
+
 	int hasHide = 0;
 	int hasDouble = 0;
 	int howFarBack = 0;
