@@ -13,6 +13,7 @@
 
 static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay);
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay);
+static int attackHunter(DracView gameState, Graph gameMap); 
 
 
 void decideDraculaMove(DracView gameState)
@@ -21,19 +22,22 @@ void decideDraculaMove(DracView gameState)
 	int teleported = FALSE;
 	// Getting locations Dracula can go to
 
+	Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
+	addRoadConnections(gameMap);
+
+
+
 	if (giveMeTheRound(gameState) == 0) {
 		bestPlay = ATHENS;
-	} else {
+	} else if (attackHunter(gameState, gameMap) == -1) {
 		int numLocations;
 		int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
 		printf("numLocations:%d\n", numLocations);
 
 		if (numLocations > 0) {
-			Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
 		   // Only dealing with road connections for now
 	//Bernice comments: I wonder if we can just get the map by gameState->view->map (where 'map' is a Graph value in GameView.c and 'view' is a gameView value in HunterView.c)
 	//   if this was possible, we may not have to generate and populate a local graph everytime
-			addRoadConnections(gameMap);
 
 			int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
 			PlayerID closestHunter = PLAYER_LORD_GODALMING;
@@ -67,6 +71,9 @@ void decideDraculaMove(DracView gameState)
 			registerBestPlay("TP", "");
 			teleported = TRUE;
 		}
+	} else {
+		int attackPlayer = attackHunter(gameState, gameMap);
+		bestPlay = whereIs(gameState, attackPlayer);
 	}
 
 
@@ -103,6 +110,22 @@ void decideDraculaMove(DracView gameState)
    
    */
 }
+
+// Checks whether there is a hunter within 1 move of Dracula
+static int attackHunter(DracView gameState, Graph gameMap) {
+	int distance = -1, player = -1, i;
+
+	for (i = 0; i < NUM_PLAYERS; i++) {
+		distance = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i));
+		if (distance == 1) {
+			player = i;
+			break;
+		}
+	}
+
+	return player;
+}
+
 
 
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
