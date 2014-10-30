@@ -13,7 +13,7 @@
 
 static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay);
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay);
-static int distanceFromCastleDracula(DracView gameState); 
+static int teleportInTrail(int trail[TRAIL_SIZE]);
 // static int attackHunter(DracView gameState, Graph gameMap); 
 
 
@@ -134,11 +134,6 @@ void decideDraculaMove(DracView gameState)
 }
 */
 
-static int distanceFromCastleDracula(DracView gameState, Graph gameMap) {
-	int distance = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), CASTLE_DRACULA);
-	return distance;
-}
-
 static int teleportInTrail(int trail[TRAIL_SIZE]) {
 	int i, inTrail = FALSE;
 
@@ -156,7 +151,7 @@ static int teleportInTrail(int trail[TRAIL_SIZE]) {
 
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay) {
 	int i;
-	int isIn = 0;
+	int isIn = FALSE;
 	// Doesn't include last move on the trail, can go there because it will drop off
 	for (i = 0; i < TRAIL_SIZE-1; i++) {
 		if (bestPlay == trail[i]) {
@@ -204,6 +199,7 @@ static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay) {
 				converted = "D1";
 				break;
 			case 1:
+				printf("Case1\n");
 				converted = "D2";
 				break;
 			case 2:

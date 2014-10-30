@@ -204,7 +204,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
     int hide = FALSE;
     int temp = 0;
     // New set of edges if case of doubleBack or hide
-    LocationID *newEdges = malloc((*numLocations)*sizeof(LocationID));
+    LocationID *newEdges = malloc(NUM_MAP_LOCATIONS*sizeof(LocationID));
     LocationID *edges;
     LocationID trail[TRAIL_SIZE];
     // Getting the trail of Dracula
