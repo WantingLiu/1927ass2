@@ -13,7 +13,8 @@
 
 static char* convertTrail(int trail[TRAIL_SIZE], int bestPlay);
 static int inTrail(int trail[TRAIL_SIZE], int bestPlay);
-static int attackHunter(DracView gameState, Graph gameMap); 
+static int distanceFromCastleDracula(DracView gameState); 
+// static int attackHunter(DracView gameState, Graph gameMap); 
 
 
 void decideDraculaMove(DracView gameState)
@@ -25,61 +26,67 @@ void decideDraculaMove(DracView gameState)
 	Graph gameMap = newGraph(NUM_MAP_LOCATIONS);
 	addRoadConnections(gameMap);
 
+	int trail[TRAIL_SIZE];
+	giveMeTheTrail(gameState, PLAYER_DRACULA, trail);
 
-
-	if (giveMeTheRound(gameState) == 0) {
-		bestPlay = ATHENS;
-	} else if (attackHunter(gameState, gameMap) == -1) {
-		int numLocations;
-		int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
-		printf("numLocations:%d\n", numLocations);
-
-		if (numLocations > 0) {
-		   // Only dealing with road connections for now
-	//Bernice comments: I wonder if we can just get the map by gameState->view->map (where 'map' is a Graph value in GameView.c and 'view' is a gameView value in HunterView.c)
-	//   if this was possible, we may not have to generate and populate a local graph everytime
-
-			int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
-			PlayerID closestHunter = PLAYER_LORD_GODALMING;
-
-			minimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING)); // Defaulting to PLAYER_LORD_GODALMING initially
-		  // Getting distance to each hunter to priortise which one to run from
-	//Bernice comments: rather have a global variable NUM_PLAYERS instead of a magic number      
-			for (i = 1; i < NUM_PLAYERS-1; i++) {
-		//Bernice comments: Brady has implemented a findPathDist() function that only returns the distance without having to pass in an array pointer.
-		//    rather use findPathDist() to eliminate any possibility of seg faults because we know how annoying C is when this happens
-				tempMinimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i));
-				if (tempMinimum < minimum) {
-					minimum = tempMinimum;
-					closestHunter = i;
-				}
-			}
-
-			  // Finding location that is furthest away from the closest hunter
-			bestPlay = paths[0];
-			minimum = findPathDist(gameMap, closestHunter, paths[0]);
-			printf("numLocations:%d\n", numLocations);
-			printf("Paths[0]:%d\n", paths[0]);
-			for (i = 1; i < numLocations; i++) {
-				tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
-				if (tempMinimum > minimum) {
-					minimum = tempMinimum;
-					bestPlay = paths[i];
-				}
-			}
-		} else if (numLocations == 0) {
-			registerBestPlay("TP", "");
-			teleported = TRUE;
-		}
+	if (teleportInTrail(trail) == FALSE && giveMeTheRound(gameState) > 0 && findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), CASTLE_DRACULA) > 4) {
+		registerBestPlay("TP", "");
+		teleported = TRUE;
 	} else {
-		int attackPlayer = attackHunter(gameState, gameMap);
-		bestPlay = whereIs(gameState, attackPlayer);
+		if (giveMeTheRound(gameState) == 0) {
+			bestPlay = ATHENS;
+		} else {
+			int numLocations;
+			int *paths = whereCanIgo(gameState, &numLocations, TRUE, FALSE);
+			printf("numLocations:%d\n", numLocations);
+
+			if (numLocations > 0) {
+			   // Only dealing with road connections for now
+
+				int i, minimum, tempMinimum; // Minimum stores the distance of the closest hunter
+				PlayerID closestHunter = PLAYER_LORD_GODALMING;
+
+				minimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, PLAYER_LORD_GODALMING)); // Defaulting to PLAYER_LORD_GODALMING initially
+			    // Getting distance to each hunter to priortise which one to run from    
+				for (i = 1; i < NUM_PLAYERS-1; i++) {
+					tempMinimum = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), whereIs(gameState, i));
+					if (tempMinimum < minimum) {
+						minimum = tempMinimum;
+						closestHunter = i;
+					}
+				}
+
+				  // Finding location that is furthest away from the closest hunter
+				bestPlay = paths[0];
+				minimum = findPathDist(gameMap, closestHunter, paths[0]);
+				printf("numLocations:%d\n", numLocations);
+				printf("Paths[0]:%d\n", paths[0]);
+				for (i = 1; i < numLocations; i++) {
+					tempMinimum = findPathDist(gameMap, closestHunter, paths[i]);
+					if (tempMinimum > minimum) {
+						minimum = tempMinimum;
+						bestPlay = paths[i];
+					}
+				}
+			} else if (numLocations == 0) {
+				registerBestPlay("TP", "");
+				teleported = TRUE;
+			}
+		}
 	}
 
 
+
+
+
+
+/*	else {
+		int attackPlayer = attackHunter(gameState, gameMap);
+		bestPlay = whereIs(gameState, attackPlayer);
+	}*/
+
+
 	// Converting to double backs and hide if needed
-	int trail[TRAIL_SIZE];
-	giveMeTheTrail(gameState, PLAYER_DRACULA, trail);
 
 	if (inTrail(trail, bestPlay) && !teleported) {
 		printf("Here\n");
@@ -112,7 +119,7 @@ void decideDraculaMove(DracView gameState)
 }
 
 // Checks whether there is a hunter within 1 move of Dracula
-static int attackHunter(DracView gameState, Graph gameMap) {
+/*static int attackHunter(DracView gameState, Graph gameMap) {
 	int distance = -1, player = -1, i;
 
 	for (i = 0; i < NUM_PLAYERS; i++) {
@@ -125,6 +132,25 @@ static int attackHunter(DracView gameState, Graph gameMap) {
 
 	return player;
 }
+*/
+
+static int distanceFromCastleDracula(DracView gameState, Graph gameMap) {
+	int distance = findPathDist(gameMap, whereIs(gameState, PLAYER_DRACULA), CASTLE_DRACULA);
+	return distance;
+}
+
+static int teleportInTrail(int trail[TRAIL_SIZE]) {
+	int i, inTrail = FALSE;
+
+	for (i = 0; i < TRAIL_SIZE-1; i++) {
+		if (trail[i] == 108) {
+			inTrail = TRUE;
+		}
+	}
+
+	return inTrail;
+}
+
 
 
 

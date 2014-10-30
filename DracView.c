@@ -236,7 +236,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
         printf("Doublebackhide\n");
         for (i = 0; i < temp; i++) {
             printf("looped\n");
-            if (edges[i] != trail[0] && edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
+            if (edges[i] != trail[0] && edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != 60) {
                 newEdges[j] = edges[i];
                 j++;
             } else {
@@ -262,7 +262,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
                         newEdges[j] = edges[i];
                         j++;
                     }
-                } else if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
+                } else if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != 60) {
                     newEdges[j] = edges[i];
                     j++;
                 } else {
@@ -274,7 +274,7 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
         } else {
             printf("Hiiii\n");
             for (i = 0; i < temp; i++) {
-                if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4]) {
+                if (edges[i] != trail[1] && edges[i] != trail[2] && edges[i] != trail[3] && edges[i] != trail[4] && edges[i] != 60) {
                     if (edges[i] == trail[0]) {
                         if (idToType(trail[0]) != SEA) {
                             newEdges[j] = edges[i];
@@ -292,8 +292,17 @@ LocationID *whereCanIgo(DracView currentView, int *numLocations, int road, int s
         }
         (*numLocations) = j;
         edges = newEdges;
-    } else if (hide == TRUE) {
-        // Do nothing, can double back to any position on the trail
+    } else {
+        for (i = 0; i < temp; i++) {
+            if (edges[i] != 60) {
+                newEdges[j] = edges[i];
+                j++;
+            } else {
+                (*numLocations)--;
+            }
+        }
+        edges = newEdges;
+        (*numLocations) = j;
     }
 
     printf("newEdges[0]:%d\n", newEdges[0]);
